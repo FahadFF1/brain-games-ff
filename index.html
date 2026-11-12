@@ -6,11 +6,12 @@
 <meta name="theme-color" content="#F7F4EE">
 <title>تمرين المخ اليومي</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#F6F3EE;--card:#fff;--ink:#17202B;--muted:#6B7280;--line:#E9E3D8;--acc:#E8673A;--acc2:#1FA99A;--good:#1F9D5C;--bad:#E5484D;--r:24px}
+:root{--bg:#F2EFE8;--card:#fff;--ink:#1D2A38;--muted:#6E7A89;--line:#E6E1D6;--acc:#0E7C6E;--acc2:#2E6F9E;--good:#1F9D5C;--bad:#E5484D;--r:22px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Tajawal',system-ui,sans-serif}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Readex Pro',system-ui,sans-serif}
 body{display:flex;justify-content:center}
 #app{width:100%;max-width:480px;min-height:100vh;padding-bottom:100px}
 button{font-family:inherit;cursor:pointer;border:0;color:inherit}
@@ -25,22 +26,23 @@ svg{display:block}
 .card p{margin:0 0 14px;color:var(--muted);line-height:1.6}
 .hero{background:linear-gradient(160deg,#21324A,#2E4A63);color:#fff}
 .hero p{color:#C9D5E3}
-.btn{background:var(--acc);color:#fff;font-weight:800;font-size:20px;border-radius:999px;padding:15px 20px;width:100%;transition:transform .1s;box-shadow:0 4px 0 #C4532C}
+.btn{background:var(--acc);color:#fff;font-weight:700;font-size:20px;border-radius:16px;padding:15px 20px;width:100%;transition:transform .1s;box-shadow:0 4px 0 #0A5C51}
 .btn:active{transform:translateY(3px);box-shadow:none}
 .btn.sec{background:#EEE8DE;color:var(--ink);box-shadow:0 4px 0 #DCD4C6}
 .ring{width:150px;height:150px;margin:4px auto 12px;position:relative}
 .ring svg.r{position:absolute;inset:0}
-.ring .c{position:absolute;inset:20px;border-radius:50%;background:linear-gradient(135deg,#F6B04A,#E8673A);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff}
+.ring .c{position:absolute;inset:20px;border-radius:50%;background:linear-gradient(135deg,#2BA393,#0E7C6E);display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff}
 .ring .c b{font-size:46px;line-height:1;font-weight:900}
 .ring .c span{font-size:12px;font-weight:700;opacity:.92}
 .center{text-align:center}
 .glist{display:flex;flex-direction:column;gap:14px;margin-top:8px}
-.grow{display:flex;align-items:center;gap:14px;background:none;width:100%;text-align:right;padding:0}
-.hero .grow{color:#fff}
+.grow{display:flex;align-items:center;gap:13px;background:#fff;width:100%;text-align:right;padding:13px 15px;border-radius:18px;box-shadow:0 3px 14px rgba(0,0,0,.05);transition:transform .1s}
+.grow:active{transform:scale(.99)}
+.hero .grow{color:#fff;background:rgba(255,255,255,.1);box-shadow:none;padding:11px 13px}
 .hero .grow small{color:#AFC0D3}
-.grow b{display:block;font-size:18px}
-.grow small{color:var(--muted);font-weight:700;letter-spacing:.5px;font-size:12px}
-.grow .best{margin-inline-start:auto;font-weight:900;color:var(--acc2);font-size:18px;text-align:left;line-height:1.1}
+.grow b{display:block;font-size:17px;font-weight:600}
+.grow small{color:var(--muted);font-weight:500;font-size:12.5px}
+.grow .best{margin-inline-start:auto;font-weight:700;color:var(--acc2);font-size:18px;text-align:left;line-height:1.1}
 .grow .best small{font-size:11px}
 .badge{border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -4px 0 rgba(0,0,0,.12)}
 .gtiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -51,7 +53,7 @@ svg{display:block}
 .week{display:flex;justify-content:space-between;margin-top:6px}
 .day{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:700}
 .stamp{width:38px;height:38px;border-radius:50%;border:2px dashed var(--line);display:flex;align-items:center;justify-content:center}
-.stamp.on{border:0;background:var(--acc);transform:rotate(-12deg);box-shadow:0 3px 0 #C4532C}
+.stamp.on{border:0;background:var(--acc);transform:rotate(-12deg);box-shadow:0 3px 0 #0A5C51}
 .stamp.today{border-color:var(--acc)}
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--line);display:flex;padding:10px 0 calc(10px + env(safe-area-inset-bottom));z-index:5}
 .nav button{flex:1;background:none;color:#9AA1AC;font-size:13px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:3px}
@@ -75,7 +77,7 @@ svg{display:block}
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:340px;direction:ltr}
 .pad button{background:#fff;border-radius:16px;font-size:28px;font-weight:800;padding:14px 0;box-shadow:0 3px 0 var(--line);display:flex;align-items:center;justify-content:center}
 .pad button:active{background:#F1ECE3;transform:translateY(2px);box-shadow:none}
-.pad .ok{background:var(--acc);color:#fff;font-size:18px;box-shadow:0 3px 0 #C4532C}
+.pad .ok{background:var(--acc);color:#fff;font-size:18px;box-shadow:0 3px 0 #0A5C51}
 .pad .blank{visibility:hidden}
 .q{font-size:52px;font-weight:900;direction:ltr;margin:8px 0}
 .ansbox{font-size:44px;font-weight:900;direction:ltr;min-width:120px;min-height:64px;text-align:center;border-bottom:4px solid var(--line);margin-bottom:22px;color:var(--acc2)}
@@ -116,7 +118,7 @@ svg{display:block}
 .btnrow{display:flex;flex-direction:column;gap:12px;width:100%}
 .bar{height:10px;background:#EEE8DE;border-radius:9px;overflow:hidden;margin-top:6px}
 .bar i{display:block;height:100%;background:var(--acc2);border-radius:9px}
-svg text{font-family:'Tajawal',sans-serif}
+svg text{font-family:'Readex Pro',sans-serif}
 .dots{display:flex;gap:6px;justify-content:center;margin:14px 0 8px;flex-wrap:wrap}
 .dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
 .dots i.on{background:var(--acc)}
@@ -786,7 +788,7 @@ function playSingle(id){
 let tab='today';
 function gameRow(g){
   const b=S.best[g.id];
-  return `<button class="grow" data-play="${g.id}">${badge(g,56)}<div><b>${g.name}</b><small>${g.cat}</small></div><div class="best">${b?b.norm+'<br><small>أفضل</small>':''}</div></button>`;
+  return `<button class="grow" data-play="${g.id}">${badge(g,52)}<div style="flex:1"><b>${g.name}</b><small>${g.cat} • مستوى ${lvl(g.id)}</small></div>${b?`<div class="best">${b.norm}<br><small>أفضل</small></div>`:`<div class="best" style="color:var(--acc);font-size:15px">ابدأ ▸</div>`}</button>`;
 }
 function topBar(){
   const last=S.ages.length?S.ages[S.ages.length-1].a:'--';
@@ -805,6 +807,8 @@ function renderToday(){
     <div class="glist" style="margin-bottom:20px;text-align:right">${ids.map(id=>gameRow(G[id])).join('')}</div>
     <button class="btn" id="startTest">${done?'أعد الاختبار':'ابدأ الاختبار'}</button>
   </div>
+  <div class="cat">كل التمارين</div>
+  <div class="gwrap glist" style="margin-bottom:6px">${GAMES.map(g=>gameRow(g)).join('')}</div>
   <div class="card"><h3>ختم الأسبوع</h3><p>العب أي تمرين كل يوم عشان تاخذ ختم وتكبر الستريك</p><div class="week">${week}</div>
   <div class="dots">${GAMES.map((g,i)=>`<i class="${i<doneCount?'on':''}"></i>`).join('')}</div>
   <div class="center" style="color:var(--muted);font-weight:700;font-size:14px">${doneCount} من ${GAMES.length} تمارين اليوم</div></div>`;
@@ -812,8 +816,7 @@ function renderToday(){
 function renderGames(){
   const cats=[...new Set(GAMES.map(g=>g.cat))];
   return `${topBar()}<div class="h1">التمارين</div><div class="sub">${GAMES.length} تمارين، اختار أي واحد والعب بحرية</div>
-  ${cats.map(c=>`<div class="cat">${c}</div><div class="gwrap gtiles">${GAMES.filter(g=>g.cat===c).map(g=>{const b=S.best[g.id];
-    return `<button class="gtile" data-play="${g.id}">${badge(g,72)}<b>${g.name}</b><div class="sc">مستوى ${lvl(g.id)}${b?' • أفضل '+b.norm:''}</div></button>`}).join('')}</div>`).join('')}`;
+  ${cats.map(c=>`<div class="cat">${c}</div><div class="gwrap glist">${GAMES.filter(g=>g.cat===c).map(g=>gameRow(g)).join('')}</div>`).join('')}`;
 }
 function ageChart(){
   const pts=S.ages.slice(-14);
@@ -822,8 +825,8 @@ function ageChart(){
   const path=pts.map((p,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(p.a).toFixed(1)}`).join('');
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="direction:ltr">
     ${[20,40,60,80].map(a=>`<line x1="${px}" x2="${W-px}" y1="${y(a)}" y2="${y(a)}" stroke="#EEE8DE"/><text x="4" y="${y(a)+4}" font-size="11" fill="#9CA3AF">${a}</text>`).join('')}
-    <path d="${path}" fill="none" stroke="#E8673A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
-    ${pts.map((p,i)=>`<circle cx="${x(i)}" cy="${y(p.a)}" r="4.5" fill="#fff" stroke="#E8673A" stroke-width="2.5"/>`).join('')}
+    <path d="${path}" fill="none" stroke="#0E7C6E" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map((p,i)=>`<circle cx="${x(i)}" cy="${y(p.a)}" r="4.5" fill="#fff" stroke="#0E7C6E" stroke-width="2.5"/>`).join('')}
   </svg><div style="color:var(--muted);font-size:13px;text-align:center">كل ما نزل الخط = مخك أصغر</div>`;
 }
 function renderBrain(){
