@@ -7,16 +7,22 @@
 <title>تمرين المخ اليومي</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playpen+Sans+Arabic:wght@400;500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+@font-face{font-family:'Thmanyah';src:url('fonts/thmanyah-sans-regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Thmanyah';src:url('fonts/thmanyah-sans-medium.woff2') format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Thmanyah';src:url('fonts/thmanyah-sans-bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Thmanyah';src:url('fonts/thmanyah-sans-black.woff2') format('woff2');font-weight:800;font-display:swap}
+@font-face{font-family:'Thmanyah Display';src:url('fonts/thmanyah-display-bold.woff2') format('woff2');font-weight:700;font-display:swap}
 :root{--bg:#F2EFE8;--card:#fff;--ink:#1D2A38;--muted:#6E7A89;--line:#E6E1D6;--acc:#0E7C6E;--acc2:#2E6F9E;--good:#1F9D5C;--bad:#E5484D;--r:22px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Playpen Sans Arabic','Readex Pro',sans-serif}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Thmanyah','Readex Pro',sans-serif}
 body{display:flex;justify-content:center}
 #app{width:100%;max-width:480px;min-height:100vh;padding-bottom:100px}
 button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 svg{display:block}
-.h1,.heroCard h3,.card h3,.intro h2,.ask,.brand,.sub,.cat{font-family:'Playpen Sans Arabic',sans-serif;font-weight:700;letter-spacing:0}
+.card h3,.intro h2,.ask,.brand,.sub,.cat{font-family:'Thmanyah',sans-serif;font-weight:700;letter-spacing:0}
+.h1,.heroCard h3{font-family:'Thmanyah Display','Thmanyah',serif;font-weight:700;letter-spacing:0}
 /* الأرقام والعناصر السريعة داخل الألعاب تبقى بخط واضح للقراءة */
 .q,.ansbox,.num,.counter .num,.ginfo,.tbar span,.pad button,.simon,.pill,.pill small,.best,.best small,.age,.result .score,.dotn,.lvl,.lvlp,.cd,.day,.sc,.ring .c b,.ring .c span,input,textarea{font-family:'Readex Pro',sans-serif!important}
 .brand{display:flex;align-items:center;gap:7px;font-weight:900;font-size:19px;margin-inline-end:auto;color:var(--ink)}
@@ -339,7 +345,7 @@ const tap=(el,f)=>el.addEventListener('pointerdown',e=>{e.preventDefault();f(e)}
 const GAMES=[];
 
 GAMES.push({id:'calc',name:'الحساب السريع',cat:'الحساب',c1:'#FF9A6B',c2:'#E8673A',
-  how:'٢٠ مسألة بسيطة. اكتب الجواب بأسرع ما تقدر، وينتقل تلقائيًا بعد ما تكمل الرقم.',
+  how:'20 مسألة بسيطة. اكتب الجواب بأسرع ما تقدر، وينتقل تلقائيًا بعد ما تكمل الرقم.',
   play(ctx){
     const P=[];for(let i=0;i<20;i++){const t=ri(0,2);let a,b,op,ans;
       const L=ctx.L,M=9+2*(L-1);const t2=L>=6&&Math.random()<.25?3:t;
@@ -367,7 +373,7 @@ GAMES.push({id:'calc',name:'الحساب السريع',cat:'الحساب',c1:'#F
   }});
 
 GAMES.push({id:'compare',name:'أيهم أكبر؟',cat:'الحساب',c1:'#5FB08E',c2:'#2F7A5E',
-  how:'معادلتين قدامك. اضغط على اللي ناتجها أكبر، أو «متساويتين». تصعب كل ما تتقدم. ٤٥ ثانية.',
+  how:'معادلتين قدامك. اضغط على اللي ناتجها أكبر، أو «متساويتين». تصعب كل ما تتقدم. 45 ثانية.',
   play(ctx){
     const gen=L=>{const t=L===0?0:ri(1,Math.min(L,3));let s,v;
       if(t===0){v=ri(1,40);s=''+v}
@@ -389,7 +395,7 @@ GAMES.push({id:'compare',name:'أيهم أكبر؟',cat:'الحساب',c1:'#5FB0
   }});
 
 GAMES.push({id:'matrix',name:'مصفوفة الذاكرة',cat:'الذاكرة',c1:'#3CCBB9',c2:'#159483',
-  how:'تنوّر مربعات لثواني ثم تختفي. اضغط على نفس المربعات. كل ما ضبطت يزيد العدد. ١٠ محاولات.',
+  how:'تنوّر مربعات لثواني ثم تختفي. اضغط على نفس المربعات. كل ما ضبطت يزيد العدد. 10 محاولات.',
   play(ctx){
     let n=3+Math.floor((ctx.L-1)/2),trial=0,pts=0,maxN=n;
     const sizeFor=n=>n<=4?3:n<=6?4:n<=9?5:6;
@@ -415,7 +421,7 @@ GAMES.push({id:'matrix',name:'مصفوفة الذاكرة',cat:'الذاكرة',
 
 const WORDS='قمر شمس بحر جبل شجرة كتاب قلم باب نافذة سيارة قطار طائرة سفينة حصان جمل قطة أسد نمر ذئب صقر حمامة وردة تفاحة موز عنب تمر خبز حليب قهوة شاي ساعة مفتاح كرسي طاولة سرير مصباح هاتف حقيبة حذاء قميص نهر مطر ثلج رمل صخرة نجمة سحابة مدرسة مسجد سوق ملعب كرة دفتر مرآة مظلة خاتم سيف درع قارب جسر'.split(' ');
 GAMES.push({id:'words',name:'تذكّر الكلمات',cat:'الذاكرة',c1:'#FFC567',c2:'#E9A23B',
-  how:'تطلع لك ١٠ كلمات لمدة ٣٠ ثانية. احفظها، وبعدها اختار الكلمات اللي شفتها من بين ٢٠ كلمة.',
+  how:'تطلع لك 10 كلمات لمدة 30 ثانية. احفظها، وبعدها اختار الكلمات اللي شفتها من بين 20 كلمة.',
   play(ctx){
     const K=Math.min(18,9+ctx.L);const pool=shuffle([...WORDS]);const shown=pool.slice(0,K),decoy=pool.slice(K,2*K);
     let left=Math.max(18,32-ctx.L);
@@ -457,7 +463,7 @@ GAMES.push({id:'simon',name:'تسلسل الألوان',cat:'الذاكرة',c1:
   }});
 
 GAMES.push({id:'lowhigh',name:'من الأصغر للأكبر',cat:'الذاكرة',c1:'#5CC6FF',c2:'#2B8FD6',
-  how:'أرقام تطلع بأماكن مختلفة ثم تتغطى. اضغط على المربعات بالترتيب من أصغر رقم لأكبر رقم. ٨ محاولات.',
+  how:'أرقام تطلع بأماكن مختلفة ثم تتغطى. اضغط على المربعات بالترتيب من أصغر رقم لأكبر رقم. 8 محاولات.',
   play(ctx){
     let n=Math.min(10,4+Math.floor((ctx.L-1)/2)),trial=0,pts=0,maxN=n;
     const go=()=>{
@@ -492,7 +498,7 @@ function catmull(P,u){
 }
 const pathLen=P=>{let L=0;for(let i=1;i<P.length;i++)L+=Math.hypot(P[i].x-P[i-1].x,P[i].y-P[i-1].y);return L};
 GAMES.push({id:'flyby',name:'العدّ الطائر',cat:'الانتباه',c1:'#62C4F5',c2:'#2F8FD0',
-  how:'طيور تطير بكل الاتجاهات: فيها اللي واقف بمكانه، واللي يتحرك، واللي يمر ورا غيره. عدّ كل الطيور اللي تشوفها. ٥ جولات.',
+  how:'طيور تطير بكل الاتجاهات: فيها اللي واقف بمكانه، واللي يتحرك، واللي يمر ورا غيره. عدّ كل الطيور اللي تشوفها. 5 جولات.',
   play(ctx){
     let r=0,pts=0,correct=0;
     const round=()=>{
@@ -562,7 +568,7 @@ GAMES.push({id:'flyby',name:'العدّ الطائر',cat:'الانتباه',c1:
 /* مدة عرض الصناديق (بالملي ثانية) — غيّرها من هنا */
 const BOX_SHOW_MS=1900;
 GAMES.push({id:'boxes',selfCD:true,name:'كم صندوق؟',cat:'التصوّر',c1:'#7FDB68',c2:'#2F9E24',
-  how:'صناديق تطلع على الشبكة لثواني ثم تختفي. عدّها كلها، حتى اللي تحت غيرها. أحيانًا تكون الشبكة مليانة وفيها صناديق ناقصة، وأحيانًا الصناديق تتحرك. ٥ جولات.',
+  how:'صناديق تطلع على الشبكة لثواني ثم تختفي. عدّها كلها، حتى اللي تحت غيرها. أحيانًا تكون الشبكة مليانة وفيها صناديق ناقصة، وأحيانًا الصناديق تتحرك. 5 جولات.',
   play(ctx){
     const L=ctx.L,G=L>=6?6:5;let r=0,pts=0,correct=0;
     const round=()=>{
@@ -676,7 +682,7 @@ GAMES.push({id:'boxes',selfCD:true,name:'كم صندوق؟',cat:'التصوّر'
   }});
 
 GAMES.push({id:'house',name:'كم واحد في البيت؟',cat:'الانتباه',c1:'#FFB45E',c2:'#F08A2E',
-  how:'ناس تدخل البيت وناس تطلع منه. تابعهم، وفي الأخير قل كم واحد باقي داخل البيت. ٣ جولات.',
+  how:'ناس تدخل البيت وناس تطلع منه. تابعهم، وفي الأخير قل كم واحد باقي داخل البيت. 3 جولات.',
   play(ctx){
     let r=0,correct=0;
     const round=()=>{
@@ -705,7 +711,7 @@ GAMES.push({id:'house',name:'كم واحد في البيت؟',cat:'الانتب�
   }});
 
 GAMES.push({id:'trail',name:'وصّل الأرقام',cat:'الانتباه',c1:'#3CCBB9',c2:'#0E8C7E',
-  how:'أرقام متفرقة على الشاشة. اضغط عليها بالترتيب ١، ٢، ٣... بأسرع ما تقدر. لوحتين.',
+  how:'أرقام متفرقة على الشاشة. اضغط عليها بالترتيب 1، 2، 3... بأسرع ما تقدر. لوحتين.',
   play(ctx){
     const add=2*Math.floor((ctx.L-1)/2),boards=[12+add,16+add];let b=0,errs=0;const t0=performance.now();
     ctx.every(100,()=>ctx.info(((performance.now()-t0)/1000).toFixed(1)+'s'));
@@ -726,7 +732,7 @@ GAMES.push({id:'trail',name:'وصّل الأرقام',cat:'الانتباه',c1:
   }});
 
 GAMES.push({id:'speed',name:'مطابقة سريعة',cat:'السرعة',c1:'#9F8BFF',c2:'#7C5CFA',
-  how:'يطلع لك شكل. قرر بسرعة: هل هو نفس الشكل اللي قبله؟ اضغط «نعم» أو «لا». ٤٥ ثانية.',
+  how:'يطلع لك شكل. قرر بسرعة: هل هو نفس الشكل اللي قبله؟ اضغط «نعم» أو «لا». 45 ثانية.',
   play(ctx){
     const L=ctx.L,rnd=()=>({s:ri(0,5),c:L>=4?SHAPE_COL[ri(0,5)]:null});const eqS=(a,b)=>a.s===b.s&&a.c===b.c;let prev=rnd(),cur,c=0,w=0,left=45,started=false;
     ctx.body.innerHTML=`<div class="ask">تذكّر هذا الشكل</div><div class="shapecard in">${shapeSvg(prev.s,prev.c)}</div><div class="yn"><button class="no">لا</button><button class="yes">نعم</button></div>`;
@@ -741,7 +747,7 @@ GAMES.push({id:'speed',name:'مطابقة سريعة',cat:'السرعة',c1:'#9F
   }});
 
 GAMES.push({id:'stroop',name:'لون الحبر',cat:'المرونة',c1:'#FF8A8C',c2:'#E5484D',
-  how:'تطلع لك كلمة لون مكتوبة بلون مختلف. اضغط على <b>لون الحبر</b> مو الكلمة نفسها! عندك ٤٥ ثانية.',
+  how:'تطلع لك كلمة لون مكتوبة بلون مختلف. اضغط على <b>لون الحبر</b> مو الكلمة نفسها! عندك 45 ثانية.',
   play(ctx){
     const C=[{n:'أحمر',c:'#E5484D'},{n:'أزرق',c:'#2F6FEB'},{n:'أخضر',c:'#1F9D5C'},{n:'أصفر',c:'#E5B000'}];
     let c=0,w=0,ink,left=45;
@@ -827,7 +833,7 @@ function renderToday(){
     <div class="inner">
       <div class="ring"><div class="c">${done?`<b>${td.age}</b><span>عمر مخك اليوم</span>`:sv('0 0 64 64',70,ART.head)}</div></div>
       <h3>${done?'خلصت اختبار اليوم':'اختبر عمر مخك'}</h3>
-      <p>${done?'تقدر تعيده، أو تكمل باقي التمارين.':'٣ تمارين قصيرة تتغير كل يوم، وتعطيك عمر مخك.'}</p>
+      <p>${done?'تقدر تعيده، أو تكمل باقي التمارين.':'3 تمارين قصيرة تتغير كل يوم، وتعطيك عمر مخك.'}</p>
       <button class="btn" id="startTest" style="max-width:300px;margin:0 auto">${done?'أعد الاختبار':'ابدأ الاختبار'}</button>
     </div>
   </div>
