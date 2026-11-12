@@ -117,7 +117,7 @@ svg{display:block}
 .mark{position:absolute;top:6px;left:50%;margin-left:-34px;pointer-events:none;animation:markf .5s forwards;z-index:9}
 @keyframes markf{0%{opacity:1;transform:scale(.5)}55%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(1)}}
 .stage{width:100%;height:340px;background:linear-gradient(#EAF6FD,#fff);border-radius:24px;position:relative;overflow:hidden;direction:ltr;box-shadow:inset 0 0 0 2px var(--line)}
-.stage.plain{background:var(--card)}
+.stage.plain{background:#EAF4EC}
 .fly{position:absolute;left:0;top:0;will-change:transform}
 .walk svg{animation:bob .32s ease-in-out infinite alternate}
 @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-4px)}}
@@ -253,11 +253,9 @@ html[data-theme="dark"] .btn.sec{background:var(--card);color:var(--ink);box-sha
 html[data-theme="dark"] .bar{background:#1E3328}
 html[data-theme="dark"] .tbar{background:#1E3328}
 html[data-theme="dark"] .newbest{background:#3A3312;color:#F2DA8C}
-html[data-theme="dark"] .stage{background:linear-gradient(#12241F,#0E1A14)}
 html[data-theme="dark"] .pad button:active{background:#1E3328}
 html[data-theme="dark"] .heroCard h3 .hl{background:#B8ECC8;color:#06361F}
 html[data-theme="dark"] #openChal{color:#CFF5DD!important;box-shadow:0 4px 0 #11291E!important}
-html[data-theme="dark"] .stage.plain{background:#14211A!important}
 /* ===== زر تبديل الوضع الداكن/الفاتح (عائم، الأيقونة تتبدّل عبر CSS) ===== */
 .theme-toggle{position:fixed;left:14px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:30;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:0 3px 12px rgba(14,26,20,.16);cursor:pointer;transition:transform .1s}
 .theme-toggle:active{transform:scale(.92)}
@@ -576,7 +574,7 @@ GAMES.push({id:'flyby',name:'العدّ الطائر',cat:'الانتباه',c1:
       const st=ctx.body.querySelector('.stage');const W=st.clientWidth,H=st.clientHeight;
       const N=[5,7,9,11,13][r]+ri(-1,0)+Math.floor((ctx.L-1)*.8),speed=[150,180,215,250,290][r]*(1+.06*(ctx.L-1)),win=2400+N*260;
       /* colours: mostly black, a few red/blue */
-      const cols=Array(N).fill('var(--ink)');const extra=r===0?1:r<3?2:3;
+      const cols=Array(N).fill('#17202B');const extra=r===0?1:r<3?2:3;
       shuffle([...Array(N).keys()]).slice(0,extra).forEach((k,i)=>cols[k]=['#E5484D','#2F6FEB','#E5484D'][i]);
       const edge=()=>{const s=ri(0,2);return s===0?{x:-50,y:ri(30,H-40)}:s===1?{x:W+50,y:ri(30,H-40)}:{x:ri(40,W-40),y:-50}};
       const spots=[];
@@ -709,7 +707,7 @@ GAMES.push({id:'boxes',selfCD:true,name:'كم صندوق؟',cat:'التصوّر'
       let grid='';for(let i=0;i<=G;i++){grid+=`<line x1="${P(i,0,0).split(',')[0]}" y1="${P(i,0,0).split(',')[1]}" x2="${P(i,G,0).split(',')[0]}" y2="${P(i,G,0).split(',')[1]}"/><line x1="${P(0,i,0).split(',')[0]}" y1="${P(0,i,0).split(',')[1]}" x2="${P(G,i,0).split(',')[0]}" y2="${P(G,i,0).split(',')[1]}"/>`}
       const box=(b,k)=>{const x0=b.x,x1=b.x+b.w,y0=b.y,y1=b.y+b.d,z0=b.z,z1=b.z+1;
         return `<g class="bx" style="animation-delay:${k*STEP}ms"><polygon class="fr" points="${P(x1,y0,z0)} ${P(x1,y1,z0)} ${P(x1,y1,z1)} ${P(x1,y0,z1)}"/><polygon class="fl2" points="${P(x0,y1,z0)} ${P(x1,y1,z0)} ${P(x1,y1,z1)} ${P(x0,y1,z1)}"/><polygon class="ft" points="${P(x0,y0,z1)} ${P(x1,y0,z1)} ${P(x1,y1,z1)} ${P(x0,y1,z1)}"/></g>`};
-      ctx.body.innerHTML=`<div class="lvl">المستوى ${L}</div><div class="ask" id="bq">احفظ الصناديق!</div><div class="tbar"><i></i><span>${(DUR/1000).toFixed(1)}</span></div><div class="stage plain" style="height:auto;padding:4px;background:#F3F3F3;position:relative"><svg viewBox="0 0 ${Wd} ${Hh}" width="100%" style="display:block"><g stroke="#444" stroke-width="1.1" stroke-dasharray="2 3">${grid}</g><g id="bxs" class="cubes" stroke="#1A1A1A" stroke-width="1.8" stroke-linejoin="round"></g></svg><div class="cdov"></div></div><div id="cnt" style="width:100%;display:flex;flex-direction:column;align-items:center"></div>`;
+      ctx.body.innerHTML=`<div class="lvl">المستوى ${L}</div><div class="ask" id="bq">احفظ الصناديق!</div><div class="tbar"><i></i><span>${(DUR/1000).toFixed(1)}</span></div><div class="stage plain" style="height:auto;padding:4px;background:#EAF4EC;position:relative"><svg viewBox="0 0 ${Wd} ${Hh}" width="100%" style="display:block"><g stroke="#444" stroke-width="1.1" stroke-dasharray="2 3">${grid}</g><g id="bxs" class="cubes" stroke="#1A1A1A" stroke-width="1.8" stroke-linejoin="round"></g></svg><div class="cdov"></div></div><div id="cnt" style="width:100%;display:flex;flex-direction:column;align-items:center"></div>`;
       const gx=ctx.body.querySelector('#bxs');
       const cdo=ctx.body.querySelector('.cdov');let cn=3;const BEAT=650;
       const beat=()=>{if(cn>0){cdo.textContent=cn;cdo.classList.remove('pp');void cdo.offsetWidth;cdo.classList.add('pp');tone(520,.12,'sine',.18);cn--;ctx.after(BEAT,beat)}
