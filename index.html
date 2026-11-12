@@ -798,9 +798,11 @@ function playSingle(id){
 
 /* ================= screens ================= */
 let tab='today';
-function gameRow(g){
+function gameRow(g,color){
   const b=S.best[g.id];
-  return `<button class="grow" data-play="${g.id}">${badge(g,52)}<div style="flex:1"><b>${g.name}</b><small>${g.cat} • مستوى ${lvl(g.id)}</small></div>${b?`<div class="best">${b.norm}<br><small>أفضل</small></div>`:`<div class="best" style="color:var(--acc);font-size:15px">ابدأ ▸</div>`}</button>`;
+  const tint=color?` style="background:${g.c2}14;border-color:${g.c2}4d"`:'';
+  const cta=color?g.c2:'var(--acc)';
+  return `<button class="grow" data-play="${g.id}"${tint}>${badge(g,52)}<div style="flex:1"><b>${g.name}</b><small>${g.cat} • مستوى ${lvl(g.id)}</small></div>${b?`<div class="best" style="color:${cta}">${b.norm}<br><small>أفضل</small></div>`:`<div class="best" style="color:${cta};font-size:15px">ابدأ ▸</div>`}</button>`;
 }
 function topBar(){
   const last=S.ages.length?S.ages[S.ages.length-1].a:'--';
@@ -820,7 +822,7 @@ function renderToday(){
     <button class="btn" id="startTest">${done?'أعد الاختبار':'ابدأ الاختبار'}</button>
   </div>
   <div class="cat">كل التمارين</div>
-  <div class="gwrap glist" style="margin-bottom:6px">${GAMES.map(g=>gameRow(g)).join('')}</div>
+  <div class="gwrap glist" style="margin-bottom:6px">${GAMES.map(g=>gameRow(g,true)).join('')}</div>
   <div class="card"><h3>ختم الأسبوع</h3><p>العب أي تمرين كل يوم عشان تاخذ ختم وتكبر الستريك</p><div class="week">${week}</div>
   <div class="dots">${GAMES.map((g,i)=>`<i class="${i<doneCount?'on':''}"></i>`).join('')}</div>
   <div class="center" style="color:var(--muted);font-weight:700;font-size:14px">${doneCount} من ${GAMES.length} تمارين اليوم</div></div>`;
@@ -828,7 +830,7 @@ function renderToday(){
 function renderGames(){
   const cats=[...new Set(GAMES.map(g=>g.cat))];
   return `${topBar()}<div class="h1">التمارين</div><div class="sub">${GAMES.length} تمارين، اختار أي واحد والعب بحرية</div>
-  ${cats.map(c=>`<div class="cat">${c}</div><div class="gwrap glist">${GAMES.filter(g=>g.cat===c).map(g=>gameRow(g)).join('')}</div>`).join('')}`;
+  ${cats.map(c=>`<div class="cat">${c}</div><div class="gwrap glist">${GAMES.filter(g=>g.cat===c).map(g=>gameRow(g,true)).join('')}</div>`).join('')}`;
 }
 function ageChart(){
   const pts=S.ages.slice(-14);
