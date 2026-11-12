@@ -1058,7 +1058,7 @@ function startChallenge({seed,settings}){CTclear();
     every:(ms,f)=>{const id=setInterval(()=>alive&&f(),ms);timers.push(id);return id},
     stop:id=>{clearTimeout(id);clearInterval(id)},
     mark:ok=>{snd(ok);const m=document.createElement('div');m.className='mark';m.innerHTML=ok?UI.ok:UI.bad;stage.appendChild(m);setTimeout(()=>m.remove(),520);if(ok&&!done){score++;bump();send();if(pmode){timeEl.textContent=score+'/'+target;if(score>=target)finish()}}},
-    done:()=>{if(done||!alive)return;stage.innerHTML='';const id=setTimeout(()=>{if(alive&&!done)startPlay()},600);timers.push(id)}};
+    done:()=>{if(done||!alive)return;timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers.length=0;stage.innerHTML='';const id=setTimeout(()=>{if(alive&&!done)startPlay()},600);timers.push(id)}};
   function startPlay(){if(!alive||done)return;try{game.play(ctx)}catch(e){}}
   function finish(){if(done)return;done=true;cleanup();CGameStop=null;send();
     stage.innerHTML=`<div style="text-align:center;margin:auto"><div class="age">${score}</div><div class="lbl" style="color:var(--muted);font-weight:800">نقطتك • بانتظار الباقي…</div></div>`}
