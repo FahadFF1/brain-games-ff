@@ -1,0 +1,9 @@
+{
+  "name": "brain-games-ff",
+  "version": "1.0.0",
+  "private": true,
+  "description": "تمرين المخ اليومي — تطبيق تمارين ذهنية عربي",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
