@@ -7,7 +7,7 @@
 <title>تمرين المخ اليومي</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#F2EFE8;--card:#fff;--ink:#1D2A38;--muted:#6E7A89;--line:#E6E1D6;--acc:#0E7C6E;--acc2:#2E6F9E;--good:#1F9D5C;--bad:#E5484D;--r:22px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
@@ -16,15 +16,19 @@ body{display:flex;justify-content:center}
 #app{width:100%;max-width:480px;min-height:100vh;padding-bottom:100px}
 button{font-family:inherit;cursor:pointer;border:0;color:inherit}
 svg{display:block}
+.h1,.card h3,.intro h2,.result .score,.age,.ask,.q,.brand{font-family:'Cairo',sans-serif;letter-spacing:-.3px}
+.brand{display:flex;align-items:center;gap:7px;font-weight:900;font-size:19px;margin-inline-end:auto;color:var(--ink)}
+.brand svg{width:24px;height:24px}
 .top{display:flex;align-items:center;gap:10px;padding:18px 16px 4px}
-.pill{background:#fff;border-radius:999px;padding:7px 14px 7px 16px;font-weight:800;font-size:18px;box-shadow:0 3px 12px rgba(0,0,0,.06);display:flex;gap:6px;align-items:center}
-.pill small{font-size:12px;color:var(--muted);font-weight:700}
+.pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:800;font-size:15px;display:flex;gap:5px;align-items:center}
+.pill small{font-size:11px;color:var(--muted);font-weight:700}
+.pill svg{width:17px;height:17px}
 .h1{font-size:30px;font-weight:900;margin:14px 18px 2px}
 .sub{color:var(--muted);margin:0 18px 8px;font-size:15px}
-.card{background:var(--card);border-radius:var(--r);margin:14px 16px;padding:20px;box-shadow:0 3px 16px rgba(0,0,0,.05)}
+.card{background:var(--card);border-radius:var(--r);margin:14px 16px;padding:20px;border:1px solid var(--line);box-shadow:0 1px 2px rgba(0,0,0,.03)}
 .card h3{margin:0 0 6px;font-size:20px;font-weight:800}
 .card p{margin:0 0 14px;color:var(--muted);line-height:1.6}
-.hero{background:linear-gradient(160deg,#21324A,#2E4A63);color:#fff}
+.hero{background:#15323B;color:#fff;border:0}
 .hero p{color:#C9D5E3}
 .btn{background:var(--acc);color:#fff;font-weight:700;font-size:20px;border-radius:16px;padding:15px 20px;width:100%;transition:transform .1s;box-shadow:0 4px 0 #0A5C51}
 .btn:active{transform:translateY(3px);box-shadow:none}
@@ -36,7 +40,7 @@ svg{display:block}
 .ring .c span{font-size:12px;font-weight:700;opacity:.92}
 .center{text-align:center}
 .glist{display:flex;flex-direction:column;gap:14px;margin-top:8px}
-.grow{display:flex;align-items:center;gap:13px;background:#fff;width:100%;text-align:right;padding:13px 15px;border-radius:18px;box-shadow:0 3px 14px rgba(0,0,0,.05);transition:transform .1s}
+.grow{display:flex;align-items:center;gap:13px;background:#fff;width:100%;text-align:right;padding:13px 15px;border-radius:16px;border:1px solid var(--line);box-shadow:0 1px 2px rgba(0,0,0,.03);transition:transform .1s}
 .grow:active{transform:scale(.99)}
 .hero .grow{color:var(--ink);background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.2);padding:12px 14px}
 .hero .grow small{color:var(--muted)}
@@ -800,7 +804,7 @@ function gameRow(g){
 }
 function topBar(){
   const last=S.ages.length?S.ages[S.ages.length-1].a:'--';
-  return `<div class="top"><div class="pill">${UI.flame} ${streak()}</div><div class="pill">${UI.gauge} ${last} <small>عمر المخ</small></div></div>`;
+  return `<div class="top"><div class="brand">${sv('0 0 24 24',24,'<path d="M8.5 19v-2.2A5 5 0 1 1 12 7.2 4 4 0 0 1 18.3 10 3.2 3.2 0 0 1 17 16.1V19z" fill="none" stroke="#0E7C6E" stroke-width="2" stroke-linejoin="round"/><path d="M12 8.2v7.6M12 11h2.2M12 13.8H9.9" stroke="#0E7C6E" stroke-width="1.6" stroke-linecap="round"/>')}<span>تمرين المخ</span></div><div class="pill">${UI.flame} ${streak()}</div><div class="pill">${UI.gauge} ${last} <small>عمر المخ</small></div></div>`;
 }
 function renderToday(){
   const d=dayKey(),td=S.days[d],ids=todaysTest(),done=td&&td.age;
