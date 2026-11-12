@@ -355,7 +355,7 @@ function record(id,res){
 
 const lvl=id=>clamp((S.lvl&&S.lvl[id])||1,1,10);
 function levelUp(id,norm){const L=lvl(id),nl=clamp(L+(norm>=80?1:norm<50?-1:0),1,10);S.lvl=S.lvl||{};S.lvl[id]=nl;save();
-  return nl>L?`مستوى جديد! ${L} ← ${nl}`:nl<L?`نزلت للمستوى ${nl}`:`باقي على المستوى ${L}`}
+  return nl>L?`مستوى جديد! ${L} ${nl}`:nl<L?`نزلت للمستوى ${nl}`:`باقي على المستوى ${L}`}
 /* ================= sound ================= */
 let AC=null;
 function tone(f,d=.18,type='triangle',vol=.12){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(vol,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d+.02)}catch(e){}}
@@ -905,7 +905,7 @@ function renderToday(){
       <button class="btn" id="startTest" style="max-width:300px;margin:0 auto">${done?'أعد الاختبار':'ابدأ الاختبار'}<span style="font-size:15px">◂</span></button>
     </div>
   </div>
-  <div class="gwrap"><button class="btn" id="openChal" style="background:var(--mint);color:#06361F;box-shadow:0 4px 0 #8FD3A6;margin-top:12px">⚔️ تحدّى صاحبك لايف</button></div>
+  <div class="gwrap"><button class="btn" id="openChal" style="background:var(--mint);color:#06361F;box-shadow:0 4px 0 #8FD3A6;margin-top:12px"> تحدّى صاحبك لايف</button></div>
   <div class="cat">كل التمارين</div>
   <div class="gwrap glist" style="margin-bottom:6px">${GAMES.map(g=>gameRow(g,true)).join('')}</div>
   <div class="card"><h3>ختم الأسبوع</h3><p>العب أي تمرين كل يوم عشان تاخذ ختم وتكبر الستريك</p><div class="week">${week}</div>
@@ -994,7 +994,7 @@ function entryView(prefCode){
   CPhase='entry';
   chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">تحدّي لايف</div></div>
   <div class="gbody"><div class="chalWrap">
-    <div class="chalHero"><b>⚔️ تحدّى أصحابك</b><span>نفس الأسئلة، بنفس اللحظة، وشوف مين الأسرع</span></div>
+    <div class="chalHero"><b> تحدّى أصحابك</b><span>نفس الأسئلة، بنفس اللحظة، وشوف مين الأسرع</span></div>
     <input class="cin" id="cnm" placeholder="اكتب اسمك" maxlength="14" value="${esc(cName())}">
     <button class="btn" id="cCreate">سوّ غرفة جديدة</button>
     <div class="orline">ـ أو ادخل غرفة صاحبك ـ</div>
@@ -1012,7 +1012,7 @@ function lobbyView(){if(!CR)return;CPhase='lobby';const me=CS&&CS.id,host=CR.hos
   chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">غرفة التحدّي</div></div>
   <div class="gbody"><div class="chalWrap">
     <div class="codebox"><div class="code">${CR.code}</div><small>شارك الكود أو الرابط مع أصحابك</small></div>
-    <button class="btn sec" id="cShare">📤 انسخ رابط الدعوة</button>
+    <button class="btn sec" id="cShare"> انسخ رابط الدعوة</button>
     <div class="plist">${CR.players.map(p=>`<div class="prow ${p.id===me?'me':''}"><span class="av">${esc((p.name[0]||'?'))}</span><span>${esc(p.name)}</span>${p.id===CR.hostId?'<span class="hostt">المضيف</span>':''}</div>`).join('')}</div>
     ${host?`<div class="opts">
       <div class="optrow"><label>اللعبة</label><div class="chips" data-opt="game">${games.map(([v,l])=>`<button class="chip ${st.game===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div></div>
@@ -1027,7 +1027,7 @@ function lobbyView(){if(!CR)return;CPhase='lobby';const me=CS&&CS.id,host=CR.hos
   </div></div>`);
   const sh=document.getElementById('cShare');
   sh.onclick=()=>{const link=location.origin+'/?c='+CR.code;
-    (navigator.clipboard?navigator.clipboard.writeText(link):Promise.reject()).then(()=>{sh.textContent='✅ اننسخ الرابط!'}).catch(()=>{prompt('انسخ الرابط:',link)})};
+    (navigator.clipboard?navigator.clipboard.writeText(link):Promise.reject()).then(()=>{sh.textContent=' اننسخ الرابط!'}).catch(()=>{prompt('انسخ الرابط:',link)})};
   if(host){
     chalEl.querySelectorAll('.chips').forEach(ch=>ch.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
       const opt=ch.dataset.opt;let v=b.dataset.v;if(opt!=='game')v=parseInt(v,10);
@@ -1067,9 +1067,9 @@ function startChallenge({seed,settings}){CTclear();
 function resultsView(rank){CTclear();CPhase='results';const me=CS&&CS.id,win=rank[0]||{name:'—',score:0};
   chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">النتيجة</div></div>
   <div class="gbody"><div class="chalWrap">
-    <div class="chalHero"><b>🏆 ${esc(win.name)}</b><span>فاز بـ ${win.score} نقطة</span></div>
-    <div class="plist">${rank.map((p,i)=>`<div class="rrow ${i===0?'first':''}"><span class="rk">${['🥇','🥈','🥉'][i]||(i+1)}</span><span>${esc(p.name)}${p.id===me?' (أنت)':''}</span><span class="sc" style="margin-inline-start:auto;font-weight:900">${p.score}</span></div>`).join('')}</div>
-    ${CR&&CR.hostId===me?`<button class="btn" id="cRe">↻ إعادة التحدّي</button>`:`<div class="center" style="color:var(--muted);font-weight:700">بانتظار المضيف يعيد…</div>`}
+    <div class="chalHero"><b> ${esc(win.name)}</b><span>فاز بـ ${win.score} نقطة</span></div>
+    <div class="plist">${rank.map((p,i)=>`<div class="rrow ${i===0?'first':''}"><span class="rk">${(i+1)}</span><span>${esc(p.name)}${p.id===me?' (أنت)':''}</span><span class="sc" style="margin-inline-start:auto;font-weight:900">${p.score}</span></div>`).join('')}</div>
+    ${CR&&CR.hostId===me?`<button class="btn" id="cRe"> إعادة التحدّي</button>`:`<div class="center" style="color:var(--muted);font-weight:700">بانتظار المضيف يعيد…</div>`}
     <button class="btn sec" id="cExit">خروج</button>
   </div></div>`);
   const re=document.getElementById('cRe');if(re)re.onclick=()=>CS.emit('rematch');
