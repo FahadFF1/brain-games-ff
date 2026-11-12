@@ -883,7 +883,7 @@ function playSingle(id){
 let tab='today';
 function gameRow(g,color){
   const b=S.best[g.id];
-  return `<button class="grow" data-play="${g.id}">${badge(g,52)}<div style="flex:1"><b>${g.name}</b><small>${g.cat} • مستوى ${lvl(g.id)}</small></div>${b?`<div class="best">${b.norm}<br><small>أفضل</small></div>`:`<div class="best" style="font-size:15px">ابدأ ▸</div>`}</button>`;
+  return `<button class="grow" data-play="${g.id}">${badge(g,52)}<div style="flex:1"><b>${g.name}</b><small>${g.cat} • مستوى ${lvl(g.id)}</small></div>${b?`<div class="best">${b.norm}<br><small>أفضل</small></div>`:`<div class="best" style="font-size:15px">ابدأ </div>`}</button>`;
 }
 function topBar(){
   const last=S.ages.length?S.ages[S.ages.length-1].a:'--';
@@ -902,7 +902,7 @@ function renderToday(){
       <div class="ring"><div class="c">${done?`<b>${td.age}</b><span>عمر مخك اليوم</span>`:sv('0 0 64 64',70,ART.head)}</div></div>
       <h3>${done?'خلّصت <span class="hl">اختبار</span> اليوم':'اختبر <span class="hl">عمر</span> مخك'}</h3>
       <p>${done?'تقدر تعيده، أو تكمل باقي التمارين.':'3 تمارين قصيرة تتغير كل يوم، وتعطيك عمر مخك.'}</p>
-      <button class="btn" id="startTest" style="max-width:300px;margin:0 auto">${done?'أعد الاختبار':'ابدأ الاختبار'}<span style="font-size:15px">◂</span></button>
+      <button class="btn" id="startTest" style="max-width:300px;margin:0 auto">${done?'أعد الاختبار':'ابدأ الاختبار'}<span style="font-size:15px"> </span></button>
     </div>
   </div>
   <div class="gwrap"><button class="btn" id="openChal" style="background:var(--mint);color:#06361F;box-shadow:0 4px 0 #8FD3A6;margin-top:12px"> تحدّى صاحبك لايف</button></div>
@@ -1018,7 +1018,7 @@ function lobbyView(){if(!CR)return;CPhase='lobby';const me=CS&&CS.id,host=CR.hos
       <div class="optrow"><label>اللعبة</label><div class="chips" data-opt="game">${games.map(([v,l])=>`<button class="chip ${st.game===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div></div>
       <div class="optrow"><label>الوقت</label><div class="chips" data-opt="duration">${durs.map(v=>`<button class="chip ${st.duration===v?'on':''}" data-v="${v}">${v}ث</button>`).join('')}</div></div>
       <div class="optrow"><label>الصعوبة</label><div class="chips" data-opt="diff">${diffs.map(([v,l])=>`<button class="chip ${st.diff===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div></div>
-      <button class="btn" id="cStart" ${CR.players.length<2?'disabled style="opacity:.55"':''}>${CR.players.length<2?'بانتظار لاعب ثاني…':'ابدأ التحدّي ◂'}</button>
+      <button class="btn" id="cStart" ${CR.players.length<2?'disabled style="opacity:.55"':''}>${CR.players.length<2?'بانتظار لاعب ثاني…':'ابدأ التحدّي '}</button>
     </div>`:`<div class="opts">
       <div class="prow"><span>اللعبة</span><span class="sc">${gName(st.game)}</span></div>
       <div class="prow"><span>الوقت</span><span class="sc">${st.duration}ث</span></div>
