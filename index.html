@@ -38,8 +38,8 @@ svg{display:block}
 .glist{display:flex;flex-direction:column;gap:14px;margin-top:8px}
 .grow{display:flex;align-items:center;gap:13px;background:#fff;width:100%;text-align:right;padding:13px 15px;border-radius:18px;box-shadow:0 3px 14px rgba(0,0,0,.05);transition:transform .1s}
 .grow:active{transform:scale(.99)}
-.hero .grow{color:#fff;background:rgba(255,255,255,.1);box-shadow:none;padding:11px 13px}
-.hero .grow small{color:#AFC0D3}
+.hero .grow{color:var(--ink);background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.2);padding:12px 14px}
+.hero .grow small{color:var(--muted)}
 .grow b{display:block;font-size:17px;font-weight:600}
 .grow small{color:var(--muted);font-weight:500;font-size:12.5px}
 .grow .best{margin-inline-start:auto;font-weight:700;color:var(--acc2);font-size:18px;text-align:left;line-height:1.1}
@@ -174,6 +174,14 @@ svg text{font-family:'Readex Pro',sans-serif}
 .lvlp{font-size:12px;font-weight:800;background:#17202B;color:#fff;padding:2px 9px;border-radius:999px;vertical-align:middle;margin-inline-start:4px}
 .stage.small{width:72%;margin:0 auto}
 .pad.compact button{padding:9px 0;font-size:24px}
+@media(min-width:720px){
+  #app{max-width:720px}
+  .nav{max-width:720px}
+  .glist{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .gwrap{margin:0 24px}
+  .h1{margin:18px 24px 2px}.sub{margin:0 24px 10px}.cat{margin:24px 26px 10px}
+  .card{margin:16px 24px}
+}
 </style>
 </head>
 <body>
