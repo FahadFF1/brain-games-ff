@@ -17,7 +17,7 @@ app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 /* ================= تحدّي لايف ================= */
 const rooms = new Map();
 const clean = s => String(s || '').trim().slice(0, 14) || 'لاعب';
-const DEFAULT = { game: 'calc', duration: 60, diff: 1 };
+const DEFAULT = { game: 'calc', duration: 60, diff: 1, mode: 'time', target: 20 };
 
 function code4() { let c; do { c = String(Math.floor(1000 + Math.random() * 9000)); } while (rooms.has(c)); return c; }
 function listPlayers(r) {
@@ -73,9 +73,10 @@ io.on('connection', socket => {
     r.state = 'playing';
     Object.values(r.players).forEach(p => { p.score = 0; p.done = false; });
     io.to(r.code).emit('go', { seed: r.seed, settings: r.settings });
-    // مؤقّت السيرفر = مدة اللعب + هامش للعدّ التنازلي
+    // مؤقّت السيرفر: بالوقت = المدة + هامش؛ بالنقاط = أمان أقصى (6 دقائق)
     clearTimeout(r.timer);
-    r.timer = setTimeout(() => endRoom(r), (r.settings.duration + 6) * 1000);
+    const _dur = r.settings.mode === 'points' ? 366 : (r.settings.duration || 60);
+    r.timer = setTimeout(() => endRoom(r), (_dur + 6) * 1000);
   });
 
   socket.on('score', ({ score, done } = {}) => {
@@ -86,6 +87,8 @@ io.on('connection', socket => {
     if (typeof score === 'number') p.score = score;
     if (done) p.done = true;
     io.to(r.code).emit('scores', listPlayers(r));
+    // بالنقاط: أول من يوصل الهدف (done) ينهي الجولة ويفوز
+    if (done && r.settings && r.settings.mode === 'points') return endRoom(r);
     if (Object.values(r.players).every(p => p.done)) endRoom(r);
   });
 

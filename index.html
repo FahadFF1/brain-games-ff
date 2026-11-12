@@ -1006,7 +1006,8 @@ function entryView(prefCode){
     CS.emit('join',{code,name},res=>{if(res&&res.ok){CR=res.snap;lobbyView()}else alert(res&&res.err||'تعذّر الدخول')})};
 }
 function lobbyView(){if(!CR)return;CPhase='lobby';const me=CS&&CS.id,host=CR.hostId===me,st=CR.settings||{};
-  const games=GAMES.map(g=>[g.id,g.name]),durs=[30,60,90],diffs=[[1,'سهل'],[2,'متوسط'],[3,'صعب']];
+  const games=GAMES.map(g=>[g.id,g.name]),durs=[60,120,180,240,300,360],targets=[10,15,20,30,50],diffs=[[1,'سهل'],[2,'متوسط'],[3,'صعب']],modes=[['time','بالوقت'],['points','بالنقاط']];
+  const cmode=st.mode||'time';
   chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">غرفة التحدّي</div></div>
   <div class="gbody"><div class="chalWrap">
     <div class="codebox"><div class="code">${CR.code}</div><small>شارك الكود أو الرابط مع أصحابك</small></div>
@@ -1014,12 +1015,15 @@ function lobbyView(){if(!CR)return;CPhase='lobby';const me=CS&&CS.id,host=CR.hos
     <div class="plist">${CR.players.map(p=>`<div class="prow ${p.id===me?'me':''}"><span class="av">${esc((p.name[0]||'?'))}</span><span>${esc(p.name)}</span>${p.id===CR.hostId?'<span class="hostt">المضيف</span>':''}</div>`).join('')}</div>
     ${host?`<div class="opts">
       <div class="optrow"><label>اللعبة</label><div class="chips" data-opt="game">${games.map(([v,l])=>`<button class="chip ${st.game===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div></div>
-      <div class="optrow"><label>الوقت</label><div class="chips" data-opt="duration">${durs.map(v=>`<button class="chip ${st.duration===v?'on':''}" data-v="${v}">${v}ث</button>`).join('')}</div></div>
+      <div class="optrow"><label>طريقة الفوز</label><div class="chips" data-opt="mode">${modes.map(([v,l])=>`<button class="chip ${cmode===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div></div>
+      ${cmode==='points'
+        ?`<div class="optrow"><label>الهدف (نقاط)</label><div class="chips" data-opt="target">${targets.map(v=>`<button class="chip ${(st.target||20)===v?'on':''}" data-v="${v}">${v}</button>`).join('')}</div></div>`
+        :`<div class="optrow"><label>الوقت</label><div class="chips" data-opt="duration">${durs.map(v=>`<button class="chip ${(st.duration||60)===v?'on':''}" data-v="${v}">${v}ث</button>`).join('')}</div></div>`}
       <div class="optrow"><label>الصعوبة</label><div class="chips" data-opt="diff">${diffs.map(([v,l])=>`<button class="chip ${st.diff===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div></div>
       <button class="btn" id="cStart" ${CR.players.length<2?'disabled style="opacity:.55"':''}>${CR.players.length<2?'بانتظار لاعب ثاني…':'ابدأ التحدّي '}</button>
     </div>`:`<div class="opts">
       <div class="prow"><span>اللعبة</span><span class="sc">${gName(st.game)}</span></div>
-      <div class="prow"><span>الوقت</span><span class="sc">${st.duration}ث</span></div>
+      <div class="prow"><span>${cmode==='points'?'الهدف':'الوقت'}</span><span class="sc">${cmode==='points'?(st.target||20)+' نقطة':(st.duration||60)+'ث'}</span></div>
       <div class="center" style="color:var(--muted);font-weight:700;padding:4px">المضيف يجهّز الإعدادات… استعد!</div>
     </div>`}
   </div></div>`);
@@ -1028,7 +1032,7 @@ function lobbyView(){if(!CR)return;CPhase='lobby';const me=CS&&CS.id,host=CR.hos
     (navigator.clipboard?navigator.clipboard.writeText(link):Promise.reject()).then(()=>{sh.textContent=' اننسخ الرابط!'}).catch(()=>{prompt('انسخ الرابط:',link)})};
   if(host){
     chalEl.querySelectorAll('.chips').forEach(ch=>ch.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
-      const opt=ch.dataset.opt;let v=b.dataset.v;if(opt!=='game')v=parseInt(v,10);
+      const opt=ch.dataset.opt;let v=b.dataset.v;if(opt!=='game'&&opt!=='mode')v=parseInt(v,10);
       CS.emit('settings',Object.assign({},st,{[opt]:v}))}));
     const sb=document.getElementById('cStart');if(sb&&CR.players.length>=2)sb.onclick=()=>CS.emit('start');
   }
@@ -1038,7 +1042,7 @@ function renderBar(){const bar=document.getElementById('csbar');if(!bar||!CSC)re
   bar.innerHTML=sorted.map(p=>`<div class="p ${p.id===me?'me':''} ${p.score===lead&&lead>0?'lead':''}"><b>${p.score}</b><small>${esc(p.name)}</small></div>`).join('')}
 function startChallenge({seed,settings}){CTclear();
   const game=G[settings.game]||G.calc,L=({1:2,2:5,3:8})[settings.diff]||5;
-  let score=0,done=false,secs=settings.duration,alive=true;const timers=[];
+  let score=0,done=false,secs=settings.duration,alive=true;const timers=[];const pmode=settings.mode==='points',target=settings.target||20;
   CRestore=Math.random;Math.random=mulberry32(seed>>>0);
   chalOpen(`<div class="ghead"><div class="gt">تحدّي • ${esc(game.name)}</div><div class="ginfo" id="ctime"></div></div>
     <div class="gbody"><div class="sbar" id="csbar"></div><div id="cstage" style="flex:1;display:flex;flex-direction:column;align-items:center;width:100%;position:relative;padding-top:6px"></div></div>`);
@@ -1053,14 +1057,16 @@ function startChallenge({seed,settings}){CTclear();
     after:(ms,f)=>{const id=setTimeout(()=>alive&&f(),ms);timers.push(id);return id},
     every:(ms,f)=>{const id=setInterval(()=>alive&&f(),ms);timers.push(id);return id},
     stop:id=>{clearTimeout(id);clearInterval(id)},
-    mark:ok=>{snd(ok);const m=document.createElement('div');m.className='mark';m.innerHTML=ok?UI.ok:UI.bad;stage.appendChild(m);setTimeout(()=>m.remove(),520);if(ok&&!done){score++;bump();send()}},
+    mark:ok=>{snd(ok);const m=document.createElement('div');m.className='mark';m.innerHTML=ok?UI.ok:UI.bad;stage.appendChild(m);setTimeout(()=>m.remove(),520);if(ok&&!done){score++;bump();send();if(pmode){timeEl.textContent=score+'/'+target;if(score>=target)finish()}}},
     done:()=>{if(done||!alive)return;stage.innerHTML='';const id=setTimeout(()=>{if(alive&&!done)startPlay()},600);timers.push(id)}};
   function startPlay(){if(!alive||done)return;try{game.play(ctx)}catch(e){}}
   function finish(){if(done)return;done=true;cleanup();CGameStop=null;send();
     stage.innerHTML=`<div style="text-align:center;margin:auto"><div class="age">${score}</div><div class="lbl" style="color:var(--muted);font-weight:800">نقطتك • بانتظار الباقي…</div></div>`}
   let cd=3;stage.innerHTML=`<div class="cd" style="margin:auto">${cd}</div>`;tone(520,.12);
-  const cdt=setInterval(()=>{cd--;if(cd>0){stage.innerHTML=`<div class="cd" style="margin:auto">${cd}</div>`;tone(520,.12)}else{clearInterval(cdt);timeEl.textContent=secs+'s';
-    const tmr=setInterval(()=>{secs--;timeEl.textContent=Math.max(0,secs)+'s';if(secs<=0){clearInterval(tmr);finish()}},1000);CT.push(tmr);stage.innerHTML='';startPlay()}},700);CT.push(cdt);
+  const cdt=setInterval(()=>{cd--;if(cd>0){stage.innerHTML=`<div class="cd" style="margin:auto">${cd}</div>`;tone(520,.12)}else{clearInterval(cdt);
+    if(pmode){timeEl.textContent=score+'/'+target;const safe=setTimeout(()=>finish(),366000);CT.push(safe);}
+    else{timeEl.textContent=secs+'s';const tmr=setInterval(()=>{secs--;timeEl.textContent=Math.max(0,secs)+'s';if(secs<=0){clearInterval(tmr);finish()}},1000);CT.push(tmr);}
+    stage.innerHTML='';startPlay()}},700);CT.push(cdt);
 }
 function resultsView(rank){CTclear();CPhase='results';const me=CS&&CS.id,win=rank[0]||{name:'—',score:0};
   chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">النتيجة</div></div>
