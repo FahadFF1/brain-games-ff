@@ -204,6 +204,40 @@ svg text{font-family:'Thmanyah Sans',sans-serif}
 .lvlp{font-size:12px;font-weight:800;background:#17202B;color:#fff;padding:2px 9px;border-radius:999px;vertical-align:middle;margin-inline-start:4px}
 .stage.small{width:72%;margin:0 auto}
 .pad.compact button{padding:9px 0;font-size:24px}
+/* ===== تحدّي لايف ===== */
+.chal .gbody{justify-content:flex-start;padding-top:8px}
+.chalWrap{width:100%;max-width:400px;margin:0 auto;display:flex;flex-direction:column;gap:13px;padding-bottom:20px}
+.chalHero{background:var(--green);color:#fff;border-radius:26px;padding:24px 20px;text-align:center}
+.chalHero b{font-family:'Thmanyah Display','Thmanyah Text',serif;font-size:26px;font-weight:800;display:block;margin-bottom:4px}
+.chalHero span{opacity:.9;font-size:14px}
+.cin{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;font-family:inherit;font-size:17px;font-weight:700;text-align:center;background:#fff;color:var(--ink)}
+.cin:focus{outline:none;border-color:var(--green)}
+.orline{text-align:center;color:var(--muted);font-weight:700;font-size:13px}
+.joinrow{display:flex;gap:10px}.joinrow .cin{flex:1}.joinrow .btn{width:auto;padding:14px 22px}
+.codebox{background:var(--mintS);border:2px dashed var(--green);border-radius:18px;padding:16px;text-align:center}
+.codebox .code{font-family:'Thmanyah Display',serif;font-size:42px;font-weight:800;letter-spacing:10px;color:var(--greenD);direction:ltr}
+.codebox small{color:var(--muted);font-weight:700}
+.plist{display:flex;flex-direction:column;gap:8px}
+.prow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 14px;font-weight:700}
+.prow .av{width:30px;height:30px;border-radius:9px;background:var(--mint);color:var(--greenD);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+.prow.me{border-color:var(--green);background:var(--mintS)}
+.prow .hostt{margin-inline-start:auto;font-size:11px;background:#0E1A14;color:#fff;padding:3px 9px;border-radius:999px}
+.prow .sc{margin-inline-start:auto;font-weight:900;color:var(--greenD)}
+.opts{display:flex;flex-direction:column;gap:12px}
+.optrow label{font-weight:800;font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:9px 15px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:14px;color:var(--ink)}
+.chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+.sbar{display:flex;gap:8px;width:100%;max-width:440px;margin:0 auto 6px;overflow-x:auto;padding:2px}
+.sbar .p{flex:1 0 auto;min-width:74px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:8px 6px;text-align:center}
+.sbar .p.me{border-color:var(--green)}
+.sbar .p b{display:block;font-size:24px;font-weight:900;color:var(--greenD);line-height:1}
+.sbar .p small{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;display:block}
+.sbar .p.lead{background:var(--green);border-color:var(--green)}.sbar .p.lead b,.sbar .p.lead small{color:#fff}
+.cq{font-size:50px;font-weight:900;direction:ltr;margin:12px 0;text-align:center}
+.rrow{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;font-weight:800}
+.rrow.first{background:var(--green);color:#fff;border:0}
+.rrow .rk{font-size:20px;width:28px;text-align:center;flex:none}
 @media(min-width:720px){
   #app{max-width:720px}
   .nav{max-width:720px}
@@ -217,6 +251,7 @@ svg text{font-family:'Thmanyah Sans',sans-serif}
 <body>
 <div id="app"></div>
 <nav class="nav"></nav>
+<script src="/socket.io/socket.io.js"></script>
 <script>
 /* ================= ART (inline SVG) ================= */
 const sv=(vb,w,inner,h)=>`<svg viewBox="${vb}" width="${w}" height="${h||w}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
@@ -848,6 +883,7 @@ function renderToday(){
       <button class="btn" id="startTest" style="max-width:300px;margin:0 auto">${done?'أعد الاختبار':'ابدأ الاختبار'}<span style="font-size:15px">◂</span></button>
     </div>
   </div>
+  <div class="gwrap"><button class="btn" id="openChal" style="background:var(--mint);color:#06361F;box-shadow:0 4px 0 #8FD3A6;margin-top:12px">⚔️ تحدّى صاحبك لايف</button></div>
   <div class="cat">كل التمارين</div>
   <div class="gwrap glist" style="margin-bottom:6px">${GAMES.map(g=>gameRow(g,true)).join('')}</div>
   <div class="card"><h3>ختم الأسبوع</h3><p>العب أي تمرين كل يوم عشان تاخذ ختم وتكبر الستريك</p><div class="week">${week}</div>
@@ -880,6 +916,129 @@ function renderBrain(){
   </div></div>
   <div class="card"><button class="btn sec" id="reset">مسح كل البيانات</button></div>`;
 }
+/* ================= تحدّي لايف ================= */
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const CGAMES={
+  calc:{name:'الحساب السريع',
+    gen(R,d){const r=(lo,hi)=>lo+Math.floor(R()*(hi-lo+1));const M=8+5*d;const t=r(0,d>=2?2:1);
+      if(t===0){const a=r(1,M),b=r(1,M);return{q:`${a} + ${b}`,ans:a+b}}
+      if(t===1){const a=r(5,10+5*d),b=r(1,a);return{q:`${a} − ${b}`,ans:a-b}}
+      const a=r(2,6+d),b=r(2,6+d);return{q:`${a} × ${b}`,ans:a*b}},
+    view(stage,q,answer){let cur='';const ans=String(q.ans);
+      stage.innerHTML=`<div class="cq">${q.q} =</div><div class="ansbox">?</div>`;
+      const box=stage.querySelector('.ansbox');
+      stage.appendChild(keypad(k=>{if(k==='⌫'){cur=cur.slice(0,-1);box.textContent=cur||'?';return}
+        if(cur.length>=3)return;cur+=k;box.textContent=cur;
+        if(cur.length>=ans.length)answer(cur===ans)}));}},
+  compare:{name:'أيهم أكبر؟',
+    gen(R,d){const r=(lo,hi)=>lo+Math.floor(R()*(hi-lo+1));
+      const mk=()=>{const t=r(0,d>=2?2:1);if(t===0){const v=r(1,30+10*d);return{s:''+v,v}}
+        if(t===1){const a=r(2,20),b=r(1,18);return R()<.5?{s:`${a} + ${b}`,v:a+b}:{s:`${Math.max(a,b)} − ${Math.min(a,b)}`,v:Math.abs(a-b)}}
+        const a=r(2,9),b=r(2,9);return{s:`${a} × ${b}`,v:a*b}};
+      const A=mk();let B=mk(),tries=0;const eq=R()<.12;
+      while(tries++<200&&(eq?B.v!==A.v:B.v===A.v))B=mk();
+      if(eq)B={s:''+A.v,v:A.v};
+      return{a:A.s,b:B.s,correct:A.v>B.v?'a':A.v<B.v?'b':'e'}},
+    view(stage,q,answer){stage.innerHTML=`<div class="cmp"><button data-k="a">${q.a}</button><button data-k="b">${q.b}</button><button class="eq" data-k="e">متساويتين =</button></div>`;
+      stage.querySelectorAll('button').forEach(b=>tap(b,()=>answer(b.dataset.k===q.correct)));}},
+  stroop:{name:'لون الحبر',
+    gen(R,d){const wi=Math.floor(R()*4);let ii=Math.floor(R()*4);if(R()<.8){while(ii===wi)ii=Math.floor(R()*4)}
+      const order=[0,1,2,3];for(let i=3;i>0;i--){const j=Math.floor(R()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
+      return{word:wi,ink:ii,order,hard:d>=2}},
+    view(stage,q,answer){const C=['أحمر','أزرق','أخضر','أصفر'],H=['#E5484D','#2F6FEB','#1F9D5C','#E5B000'];
+      stage.innerHTML=`<div class="word" style="color:${H[q.ink]}">${C[q.word]}</div><div class="cbtns"></div>`;
+      const bs=stage.querySelector('.cbtns');
+      q.order.forEach((ci,i)=>{const b=document.createElement('button');b.textContent=C[ci];
+        if(q.hard)b.style.color=H[q.order[(i+1)%4]];
+        tap(b,()=>answer(ci===q.ink));bs.appendChild(b)})}},
+};
+const GLBL={calc:'حساب',compare:'أيهم أكبر',stroop:'لون الحبر'};
+let CS=null,CR=null,CSC=null,chalEl=null,CT=[];
+function cName(){try{return localStorage.getItem('chal_name')||''}catch(e){return''}}
+function CTclear(){CT.forEach(t=>{clearInterval(t);clearTimeout(t)});CT=[]}
+function chalOpen(html){if(!chalEl){chalEl=document.createElement('div');chalEl.className='game chal';document.body.appendChild(chalEl)}chalEl.innerHTML=html;const x=chalEl.querySelector('[data-x]');if(x)x.onclick=chalClose;return chalEl}
+function chalClose(){CTclear();if(chalEl){chalEl.remove();chalEl=null}if(CS){CS.emit('leave');CS.disconnect();CS=null}CR=null;CSC=null}
+function sock(){if(CS)return CS;if(!window.io){alert('التحدي يحتاج اتصال بالإنترنت — حدّث الصفحة وحاول مرة ثانية');return null}
+  CS=io();
+  CS.on('room',r=>{CR=r;if(r.state==='lobby')lobbyView()});
+  CS.on('go',d=>startChallenge(d));
+  CS.on('scores',list=>{CSC=list;renderBar()});
+  CS.on('results',rank=>resultsView(rank));
+  return CS;}
+function chalStart(prefCode){if(!sock())return;entryView(prefCode||'')}
+function entryView(prefCode){
+  chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">تحدّي لايف</div></div>
+  <div class="gbody"><div class="chalWrap">
+    <div class="chalHero"><b>⚔️ تحدّى أصحابك</b><span>نفس الأسئلة، بنفس اللحظة، وشوف مين الأسرع</span></div>
+    <input class="cin" id="cnm" placeholder="اكتب اسمك" maxlength="14" value="${esc(cName())}">
+    <button class="btn" id="cCreate">سوّ غرفة جديدة</button>
+    <div class="orline">ـ أو ادخل غرفة صاحبك ـ</div>
+    <div class="joinrow"><input class="cin" id="ccode" placeholder="الكود" inputmode="numeric" maxlength="4" value="${esc(prefCode)}"><button class="btn sec" id="cJoin">دخول</button></div>
+  </div></div>`);
+  const nm=()=>{const v=document.getElementById('cnm').value.trim();try{localStorage.setItem('chal_name',v)}catch(e){}return v};
+  document.getElementById('cCreate').onclick=()=>{const name=nm();if(!name)return document.getElementById('cnm').focus();
+    CS.emit('create',{name},res=>{if(res&&res.ok){CR=res.snap;lobbyView()}})};
+  document.getElementById('cJoin').onclick=()=>{const name=nm();if(!name)return document.getElementById('cnm').focus();
+    const code=document.getElementById('ccode').value.trim();if(!code)return document.getElementById('ccode').focus();
+    CS.emit('join',{code,name},res=>{if(res&&res.ok){CR=res.snap;lobbyView()}else alert(res&&res.err||'تعذّر الدخول')})};
+}
+function lobbyView(){if(!CR)return;const me=CS&&CS.id,host=CR.hostId===me,st=CR.settings||{};
+  const games=[['calc','حساب'],['compare','أيهم أكبر'],['stroop','لون الحبر']],durs=[30,60,90],diffs=[[1,'سهل'],[2,'متوسط'],[3,'صعب']];
+  chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">غرفة التحدّي</div></div>
+  <div class="gbody"><div class="chalWrap">
+    <div class="codebox"><div class="code">${CR.code}</div><small>شارك الكود أو الرابط مع أصحابك</small></div>
+    <button class="btn sec" id="cShare">📤 انسخ رابط الدعوة</button>
+    <div class="plist">${CR.players.map(p=>`<div class="prow ${p.id===me?'me':''}"><span class="av">${esc((p.name[0]||'?'))}</span><span>${esc(p.name)}</span>${p.id===CR.hostId?'<span class="hostt">المضيف</span>':''}</div>`).join('')}</div>
+    ${host?`<div class="opts">
+      <div class="optrow"><label>اللعبة</label><div class="chips" data-opt="game">${games.map(([v,l])=>`<button class="chip ${st.game===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div></div>
+      <div class="optrow"><label>الوقت</label><div class="chips" data-opt="duration">${durs.map(v=>`<button class="chip ${st.duration===v?'on':''}" data-v="${v}">${v}ث</button>`).join('')}</div></div>
+      <div class="optrow"><label>الصعوبة</label><div class="chips" data-opt="diff">${diffs.map(([v,l])=>`<button class="chip ${st.diff===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div></div>
+      <button class="btn" id="cStart" ${CR.players.length<2?'disabled style="opacity:.55"':''}>${CR.players.length<2?'بانتظار لاعب ثاني…':'ابدأ التحدّي ◂'}</button>
+    </div>`:`<div class="opts">
+      <div class="prow"><span>اللعبة</span><span class="sc">${GLBL[st.game]||''}</span></div>
+      <div class="prow"><span>الوقت</span><span class="sc">${st.duration}ث</span></div>
+      <div class="center" style="color:var(--muted);font-weight:700;padding:4px">المضيف يجهّز الإعدادات… استعد!</div>
+    </div>`}
+  </div></div>`);
+  const sh=document.getElementById('cShare');
+  sh.onclick=()=>{const link=location.origin+'/?c='+CR.code;
+    (navigator.clipboard?navigator.clipboard.writeText(link):Promise.reject()).then(()=>{sh.textContent='✅ اننسخ الرابط!'}).catch(()=>{prompt('انسخ الرابط:',link)})};
+  if(host){
+    chalEl.querySelectorAll('.chips').forEach(ch=>ch.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+      const opt=ch.dataset.opt;let v=b.dataset.v;if(opt!=='game')v=parseInt(v,10);
+      CS.emit('settings',Object.assign({},st,{[opt]:v}))}));
+    const sb=document.getElementById('cStart');if(sb&&CR.players.length>=2)sb.onclick=()=>CS.emit('start');
+  }
+}
+function renderBar(){const bar=document.getElementById('csbar');if(!bar||!CSC)return;const me=CS&&CS.id;
+  const sorted=[...CSC].sort((a,b)=>b.score-a.score),lead=sorted.length?sorted[0].score:0;
+  bar.innerHTML=sorted.map(p=>`<div class="p ${p.id===me?'me':''} ${p.score===lead&&lead>0?'lead':''}"><b>${p.score}</b><small>${esc(p.name)}</small></div>`).join('')}
+function startChallenge({seed,settings}){CTclear();const g=CGAMES[settings.game]||CGAMES.calc,R=mulberry32(seed),d=settings.diff||1;
+  let score=0,done=false,secs=settings.duration;
+  chalOpen(`<div class="ghead"><div class="gt">تحدّي • ${g.name}</div><div class="ginfo" id="ctime"></div></div>
+    <div class="gbody"><div class="sbar" id="csbar"></div><div id="cstage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%"></div></div>`);
+  CSC=CR?CR.players.map(p=>({id:p.id,name:p.name,score:0})):null;renderBar();
+  const stage=document.getElementById('cstage'),timeEl=document.getElementById('ctime');
+  const send=()=>{if(CS)CS.emit('score',{score,done})};
+  const bump=()=>{if(CSC){const m=CSC.find(p=>p.id===(CS&&CS.id));if(m)m.score=score;renderBar()}};
+  function nextQ(){if(done)return;const q=g.gen(R,d);g.view(stage,q,ok=>{if(done)return;if(ok){score++;snd(true);bump();send()}else snd(false);nextQ()})}
+  function finish(){if(done)return;done=true;send();stage.innerHTML=`<div style="text-align:center"><div class="age">${score}</div><div class="lbl" style="color:var(--muted);font-weight:800">نقطتك • بانتظار الباقي…</div></div>`}
+  let cd=3;stage.innerHTML=`<div class="cd">${cd}</div>`;tone(520,.12);
+  const cdt=setInterval(()=>{cd--;if(cd>0){stage.innerHTML=`<div class="cd">${cd}</div>`;tone(520,.12)}else{clearInterval(cdt);timeEl.textContent=secs+'s';
+    const tmr=setInterval(()=>{secs--;timeEl.textContent=Math.max(0,secs)+'s';if(secs<=0){clearInterval(tmr);finish()}},1000);CT.push(tmr);nextQ()}},700);CT.push(cdt);
+}
+function resultsView(rank){CTclear();const me=CS&&CS.id,win=rank[0]||{name:'—',score:0};
+  chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">النتيجة</div></div>
+  <div class="gbody"><div class="chalWrap">
+    <div class="chalHero"><b>🏆 ${esc(win.name)}</b><span>فاز بـ ${win.score} نقطة</span></div>
+    <div class="plist">${rank.map((p,i)=>`<div class="rrow ${i===0?'first':''}"><span class="rk">${['🥇','🥈','🥉'][i]||(i+1)}</span><span>${esc(p.name)}${p.id===me?' (أنت)':''}</span><span class="sc" style="margin-inline-start:auto;font-weight:900">${p.score}</span></div>`).join('')}</div>
+    ${CR&&CR.hostId===me?`<button class="btn" id="cRe">↻ إعادة التحدّي</button>`:`<div class="center" style="color:var(--muted);font-weight:700">بانتظار المضيف يعيد…</div>`}
+    <button class="btn sec" id="cExit">خروج</button>
+  </div></div>`);
+  const re=document.getElementById('cRe');if(re)re.onclick=()=>CS.emit('rematch');
+  document.getElementById('cExit').onclick=chalClose;
+}
 const NAV=[['today','اليوم',UI.navToday],['games','التمارين',UI.navGames],['brain','مخّي',UI.navBrain]];
 $('.nav').innerHTML=NAV.map(([k,l,i])=>`<button data-tab="${k}">${i}${l}</button>`).join('');
 function render(){
@@ -888,6 +1047,7 @@ function render(){
   document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
   app.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>playSingle(b.dataset.play));
   const st=$('#startTest');if(st)st.onclick=startTest;
+  const oc=$('#openChal');if(oc)oc.onclick=()=>chalStart();
   const rs=$('#reset');if(rs)rs.onclick=()=>{
     if(rs.dataset.sure){S={days:{},best:{},hist:{},ages:[]};save();render()}
     else{rs.dataset.sure=1;rs.textContent='متأكد؟ اضغط مرة ثانية';rs.style.background='#FCDCDD'}};
@@ -895,6 +1055,7 @@ function render(){
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render()});
 render();
+try{const mc=new URLSearchParams(location.search).get('c');if(mc&&/^\d{4}$/.test(mc))chalStart(mc)}catch(e){}
 </script>
 </body>
 </html>
