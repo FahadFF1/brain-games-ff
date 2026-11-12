@@ -750,7 +750,7 @@ GAMES.push({id:'stroop',name:'لون الحبر',cat:'المرونة',c1:'#FF8A8
     const next=()=>{const wd=C[ri(0,3)];ink=Math.random()<.75?shuffle(C.filter(x=>x!==wd))[0]:wd;word.textContent=wd.n;word.style.color=ink.c};
     const L=ctx.L;
     const layout=()=>{bs.innerHTML='';const cs=shuffle([...C]);cs.forEach((col,i)=>{const b=document.createElement('button');b.textContent=col.n;
-      if(L>=4)b.style.color=cs[(i+1)%4].c;
+      if(L>=3)b.style.color=cs[(i+1)%4].c;
       tap(b,()=>{const ok=col===ink;ok?c++:w++;ctx.mark(ok);if(L>=7)layout();next()});bs.appendChild(b)})};
     layout();next();ctx.info(left+'s');
     ctx.every(1000,()=>{left--;ctx.info(left+'s');if(left<=0)ctx.done({norm:clamp(Math.round((c-w)/30*100),0,100),stat:`${c} صح • ${w} غلط`})});
