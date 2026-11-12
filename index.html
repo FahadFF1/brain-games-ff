@@ -953,21 +953,23 @@ const CGAMES={
         if(q.hard)b.style.color=H[q.order[(i+1)%4]];
         tap(b,()=>answer(ci===q.ink));bs.appendChild(b)})}},
 };
-const GLBL={calc:'حساب',compare:'أيهم أكبر',stroop:'لون الحبر'};
-let CS=null,CR=null,CSC=null,chalEl=null,CT=[];
+const gName=id=>(G[id]&&G[id].name)||id;
+let CS=null,CR=null,CSC=null,chalEl=null,CT=[],CGameStop=null,CRestore=null,CPhase='';
 function cName(){try{return localStorage.getItem('chal_name')||''}catch(e){return''}}
-function CTclear(){CT.forEach(t=>{clearInterval(t);clearTimeout(t)});CT=[]}
+function restoreRand(){if(CRestore){Math.random=CRestore;CRestore=null}}
+function CTclear(){if(CGameStop){try{CGameStop()}catch(e){}CGameStop=null}restoreRand();CT.forEach(t=>{clearInterval(t);clearTimeout(t)});CT=[]}
 function chalOpen(html){if(!chalEl){chalEl=document.createElement('div');chalEl.className='game chal';document.body.appendChild(chalEl)}chalEl.innerHTML=html;const x=chalEl.querySelector('[data-x]');if(x)x.onclick=chalClose;return chalEl}
-function chalClose(){CTclear();if(chalEl){chalEl.remove();chalEl=null}if(CS){CS.emit('leave');CS.disconnect();CS=null}CR=null;CSC=null}
+function chalClose(){CTclear();CPhase='';if(chalEl){chalEl.remove();chalEl=null}if(CS){CS.emit('leave');CS.disconnect();CS=null}CR=null;CSC=null}
 function sock(){if(CS)return CS;if(!window.io){alert('التحدي يحتاج اتصال بالإنترنت — حدّث الصفحة وحاول مرة ثانية');return null}
   CS=io();
-  CS.on('room',r=>{CR=r;if(r.state==='lobby')lobbyView()});
-  CS.on('go',d=>startChallenge(d));
+  CS.on('room',r=>{CR=r;if(r.state==='lobby'&&CPhase!=='play')lobbyView()});
+  CS.on('go',d=>{CPhase='play';startChallenge(d)});
   CS.on('scores',list=>{CSC=list;renderBar()});
   CS.on('results',rank=>resultsView(rank));
   return CS;}
 function chalStart(prefCode){if(!sock())return;entryView(prefCode||'')}
 function entryView(prefCode){
+  CPhase='entry';
   chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">تحدّي لايف</div></div>
   <div class="gbody"><div class="chalWrap">
     <div class="chalHero"><b>⚔️ تحدّى أصحابك</b><span>نفس الأسئلة، بنفس اللحظة، وشوف مين الأسرع</span></div>
@@ -983,8 +985,8 @@ function entryView(prefCode){
     const code=document.getElementById('ccode').value.trim();if(!code)return document.getElementById('ccode').focus();
     CS.emit('join',{code,name},res=>{if(res&&res.ok){CR=res.snap;lobbyView()}else alert(res&&res.err||'تعذّر الدخول')})};
 }
-function lobbyView(){if(!CR)return;const me=CS&&CS.id,host=CR.hostId===me,st=CR.settings||{};
-  const games=[['calc','حساب'],['compare','أيهم أكبر'],['stroop','لون الحبر']],durs=[30,60,90],diffs=[[1,'سهل'],[2,'متوسط'],[3,'صعب']];
+function lobbyView(){if(!CR)return;CPhase='lobby';const me=CS&&CS.id,host=CR.hostId===me,st=CR.settings||{};
+  const games=GAMES.map(g=>[g.id,g.name]),durs=[30,60,90],diffs=[[1,'سهل'],[2,'متوسط'],[3,'صعب']];
   chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">غرفة التحدّي</div></div>
   <div class="gbody"><div class="chalWrap">
     <div class="codebox"><div class="code">${CR.code}</div><small>شارك الكود أو الرابط مع أصحابك</small></div>
@@ -996,7 +998,7 @@ function lobbyView(){if(!CR)return;const me=CS&&CS.id,host=CR.hostId===me,st=CR.
       <div class="optrow"><label>الصعوبة</label><div class="chips" data-opt="diff">${diffs.map(([v,l])=>`<button class="chip ${st.diff===v?'on':''}" data-v="${v}">${l}</button>`).join('')}</div></div>
       <button class="btn" id="cStart" ${CR.players.length<2?'disabled style="opacity:.55"':''}>${CR.players.length<2?'بانتظار لاعب ثاني…':'ابدأ التحدّي ◂'}</button>
     </div>`:`<div class="opts">
-      <div class="prow"><span>اللعبة</span><span class="sc">${GLBL[st.game]||''}</span></div>
+      <div class="prow"><span>اللعبة</span><span class="sc">${gName(st.game)}</span></div>
       <div class="prow"><span>الوقت</span><span class="sc">${st.duration}ث</span></div>
       <div class="center" style="color:var(--muted);font-weight:700;padding:4px">المضيف يجهّز الإعدادات… استعد!</div>
     </div>`}
@@ -1014,21 +1016,33 @@ function lobbyView(){if(!CR)return;const me=CS&&CS.id,host=CR.hostId===me,st=CR.
 function renderBar(){const bar=document.getElementById('csbar');if(!bar||!CSC)return;const me=CS&&CS.id;
   const sorted=[...CSC].sort((a,b)=>b.score-a.score),lead=sorted.length?sorted[0].score:0;
   bar.innerHTML=sorted.map(p=>`<div class="p ${p.id===me?'me':''} ${p.score===lead&&lead>0?'lead':''}"><b>${p.score}</b><small>${esc(p.name)}</small></div>`).join('')}
-function startChallenge({seed,settings}){CTclear();const g=CGAMES[settings.game]||CGAMES.calc,R=mulberry32(seed),d=settings.diff||1;
-  let score=0,done=false,secs=settings.duration;
-  chalOpen(`<div class="ghead"><div class="gt">تحدّي • ${g.name}</div><div class="ginfo" id="ctime"></div></div>
-    <div class="gbody"><div class="sbar" id="csbar"></div><div id="cstage" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%"></div></div>`);
+function startChallenge({seed,settings}){CTclear();
+  const game=G[settings.game]||G.calc,L=({1:2,2:5,3:8})[settings.diff]||5;
+  let score=0,done=false,secs=settings.duration,alive=true;const timers=[];
+  CRestore=Math.random;Math.random=mulberry32(seed>>>0);
+  chalOpen(`<div class="ghead"><div class="gt">تحدّي • ${esc(game.name)}</div><div class="ginfo" id="ctime"></div></div>
+    <div class="gbody"><div class="sbar" id="csbar"></div><div id="cstage" style="flex:1;display:flex;flex-direction:column;align-items:center;width:100%;position:relative;padding-top:6px"></div></div>`);
   CSC=CR?CR.players.map(p=>({id:p.id,name:p.name,score:0})):null;renderBar();
   const stage=document.getElementById('cstage'),timeEl=document.getElementById('ctime');
   const send=()=>{if(CS)CS.emit('score',{score,done})};
   const bump=()=>{if(CSC){const m=CSC.find(p=>p.id===(CS&&CS.id));if(m)m.score=score;renderBar()}};
-  function nextQ(){if(done)return;const q=g.gen(R,d);g.view(stage,q,ok=>{if(done)return;if(ok){score++;snd(true);bump();send()}else snd(false);nextQ()})}
-  function finish(){if(done)return;done=true;send();stage.innerHTML=`<div style="text-align:center"><div class="age">${score}</div><div class="lbl" style="color:var(--muted);font-weight:800">نقطتك • بانتظار الباقي…</div></div>`}
-  let cd=3;stage.innerHTML=`<div class="cd">${cd}</div>`;tone(520,.12);
-  const cdt=setInterval(()=>{cd--;if(cd>0){stage.innerHTML=`<div class="cd">${cd}</div>`;tone(520,.12)}else{clearInterval(cdt);timeEl.textContent=secs+'s';
-    const tmr=setInterval(()=>{secs--;timeEl.textContent=Math.max(0,secs)+'s';if(secs<=0){clearInterval(tmr);finish()}},1000);CT.push(tmr);nextQ()}},700);CT.push(cdt);
+  function cleanup(){alive=false;timers.forEach(t=>{clearTimeout(t);clearInterval(t)});timers.length=0;restoreRand()}
+  CGameStop=cleanup;
+  const ctx={body:stage,game,L,
+    info:()=>{},
+    after:(ms,f)=>{const id=setTimeout(()=>alive&&f(),ms);timers.push(id);return id},
+    every:(ms,f)=>{const id=setInterval(()=>alive&&f(),ms);timers.push(id);return id},
+    stop:id=>{clearTimeout(id);clearInterval(id)},
+    mark:ok=>{snd(ok);const m=document.createElement('div');m.className='mark';m.innerHTML=ok?UI.ok:UI.bad;stage.appendChild(m);setTimeout(()=>m.remove(),520);if(ok&&!done){score++;bump();send()}},
+    done:()=>{if(done||!alive)return;stage.innerHTML='';const id=setTimeout(()=>{if(alive&&!done)startPlay()},600);timers.push(id)}};
+  function startPlay(){if(!alive||done)return;try{game.play(ctx)}catch(e){}}
+  function finish(){if(done)return;done=true;cleanup();CGameStop=null;send();
+    stage.innerHTML=`<div style="text-align:center;margin:auto"><div class="age">${score}</div><div class="lbl" style="color:var(--muted);font-weight:800">نقطتك • بانتظار الباقي…</div></div>`}
+  let cd=3;stage.innerHTML=`<div class="cd" style="margin:auto">${cd}</div>`;tone(520,.12);
+  const cdt=setInterval(()=>{cd--;if(cd>0){stage.innerHTML=`<div class="cd" style="margin:auto">${cd}</div>`;tone(520,.12)}else{clearInterval(cdt);timeEl.textContent=secs+'s';
+    const tmr=setInterval(()=>{secs--;timeEl.textContent=Math.max(0,secs)+'s';if(secs<=0){clearInterval(tmr);finish()}},1000);CT.push(tmr);stage.innerHTML='';startPlay()}},700);CT.push(cdt);
 }
-function resultsView(rank){CTclear();const me=CS&&CS.id,win=rank[0]||{name:'—',score:0};
+function resultsView(rank){CTclear();CPhase='results';const me=CS&&CS.id,win=rank[0]||{name:'—',score:0};
   chalOpen(`<div class="ghead"><button class="x" data-x>${UI.close}</button><div class="gt">النتيجة</div></div>
   <div class="gbody"><div class="chalWrap">
     <div class="chalHero"><b>🏆 ${esc(win.name)}</b><span>فاز بـ ${win.score} نقطة</span></div>
