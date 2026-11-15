@@ -854,29 +854,39 @@ GAMES.push({id:'lamha',name:'لمحة',cat:'الذاكرة',c1:'#F2C14E',c2:'#E0
       park:SV+'<rect width="300" height="400" fill="#BFE3F5"/><circle cx="252" cy="52" r="28" fill="#FBE38A"/><ellipse cx="66" cy="58" rx="32" ry="15" fill="#fff" opacity=".85"/><ellipse cx="104" cy="52" rx="24" ry="13" fill="#fff" opacity=".85"/><path d="M0 205 Q150 180 300 205 V400 H0Z" fill="#A9D96F"/><path d="M112 400 Q150 300 150 226 Q150 300 194 400Z" fill="#CBE892" opacity=".6"/></svg>',
       playroom:SV+'<rect width="300" height="400" fill="#F7E8D4"/><rect y="225" width="300" height="175" fill="#E7C79A"/><rect y="221" width="300" height="5" fill="#C99F68"/><rect x="34" y="48" width="92" height="72" rx="6" fill="#CDE8F5" stroke="#B88A5A" stroke-width="3"/><line x1="80" y1="48" x2="80" y2="120" stroke="#B88A5A" stroke-width="3"/><line x1="34" y1="84" x2="126" y2="84" stroke="#B88A5A" stroke-width="3"/><ellipse cx="150" cy="340" rx="118" ry="40" fill="#F2D3A4" opacity=".55"/></svg>',
       majlis:SV+'<rect width="300" height="400" fill="#EEDFC2"/><rect y="185" width="300" height="215" fill="#CBA876"/><rect x="18" y="205" width="264" height="178" rx="8" fill="#B88E57" stroke="#8A5A2E" stroke-width="4"/><rect x="40" y="38" width="76" height="92" rx="38" fill="#D7C39A" stroke="#8A5A2E" stroke-width="3"/><circle cx="150" cy="294" r="5" fill="#8A5A2E" opacity=".45"/><circle cx="92" cy="250" r="4" fill="#8A5A2E" opacity=".35"/><circle cx="208" cy="250" r="4" fill="#8A5A2E" opacity=".35"/></svg>',
-      office:SV+'<rect width="300" height="400" fill="#DDE7EE"/><rect y="200" width="300" height="200" fill="#C7CED6"/><rect y="196" width="300" height="5" fill="#A7AEB6"/><rect x="168" y="44" width="104" height="78" rx="4" fill="#CDE8F5" stroke="#9AA3AD" stroke-width="3"/><line x1="220" y1="44" x2="220" y2="122" stroke="#9AA3AD" stroke-width="3"/><line x1="168" y1="83" x2="272" y2="83" stroke="#9AA3AD" stroke-width="3"/></svg>'
+      office:SV+'<rect width="300" height="400" fill="#DDE7EE"/><rect y="200" width="300" height="200" fill="#C7CED6"/><rect y="196" width="300" height="5" fill="#A7AEB6"/><rect x="168" y="44" width="104" height="78" rx="4" fill="#CDE8F5" stroke="#9AA3AD" stroke-width="3"/><line x1="220" y1="44" x2="220" y2="122" stroke="#9AA3AD" stroke-width="3"/><line x1="168" y1="83" x2="272" y2="83" stroke="#9AA3AD" stroke-width="3"/></svg>',
+      beach:SV+'<rect width="300" height="400" fill="#BFE3F5"/><circle cx="248" cy="48" r="26" fill="#FBE38A"/><rect y="150" width="300" height="72" fill="#86C8E6"/><path d="M0 222 Q150 202 300 222 V400 H0Z" fill="#F0DCA6"/><path d="M0 150 Q75 146 150 150 T300 150" stroke="#6FB5D6" stroke-width="2" fill="none"/><path d="M8 248 Q150 230 292 248" stroke="#E6CF92" stroke-width="2" fill="none" opacity=".6"/></svg>'
     };
+    const SCALE={car:50,tree:110,beach_umbrella:78,duck:16,bench:30,boy:85,lamp_post:98,picnic_basket:18,bicycle:48,kite:42,balloon:30,football:14,dog:26,cat:22,bird:11,flower_bush:34,girl:80,ice_cream_cart:72,swing:78,slide:82,trash_bin:32,water_fountain:56,butterfly:10,sand_bucket:13,basketball:16,teddy_bear:30,toy_car:18,blocks:12,rubber_duck:12,drum:26,robot:28,toy_train:20,book:12,crayons:10,toy_plane:22,spinning_top:12,xylophone:18,toy_chest:40,wall_clock:24,rubik_cube:12,rocket:30,puzzle_piece:9,piggy_bank:18,dinosaur:26,beanbag:34,party_balloon:42,sailboat:22,rocking_horse:44,dallah:30,finjan:11,dates_plate:14,floor_cushion:26,mabkhara:18,tea_glass:13,teapot:22,thermos:24,television:40,side_table:30,tissue_box:14,mobile_phone:9,sweets_bowl:16,water_bottle:16,slippers:11,man_standing:100,man_sitting:62,prayer_beads:10,oud_bottle:16,falcon:30,lantern:30,palm_plant:92,newspaper:14,monitor:34,coffee_mug:12,file_folder:16,pen:8,succulent:16,desk_lamp:30,office_chair:55,laptop:20,printer:34,desk_phone:16,stapler:10,clipboard:18,water_cooler:70,waste_basket:28,sticky_notes:8,man_worker:100,woman_worker:96,whiteboard:62,calculator:12,headphones:20,book_stack:20,scissors:12,mouse:8};
+    const WALL=new Set(['wall_clock','television','whiteboard']);
+    const beachList=new Set(['beach_umbrella','duck','football','sand_bucket','kite','ice_cream_cart','boy','girl','bird','butterfly','dog','cat','bicycle','balloon','picnic_basket']);
+    const sizeOf=it=>Math.max(5,Math.min(21,5+(Math.min(SCALE[it.item]||22,110)/110)*16));
+    const floorTop={park:46,beach:50,playroom:56,majlis:46,office:50};
     const rnd=a=>a[Math.floor(Math.random()*a.length)], shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
     const ROUNDS=5, lv=ctx.L;
     const total=Math.min(40,6+Math.round(lv*3.2)), secsWatch=Math.max(4,11-lv), useColors=lv>=3;
     let r=0,correct=0;
     function round(){
       ctx.info(`${r+1}/${ROUNDS}`);
-      const sc=rnd(Object.keys(L.scenes)), pool=L.items.filter(i=>i.scene===sc);
+      const sc=rnd(['park','beach','playroom','majlis','office']);
+      const pool=sc==='beach'?L.items.filter(i=>i.scene==='park'&&beachList.has(i.item)):L.items.filter(i=>i.scene===sc);
       const nTypes=Math.max(3,Math.min(8,Math.round(total/3)));
       const types=shuf(pool).slice(0,nTypes), placed=[];
       for(let n=0;n<total;n++){const t=types[n%types.length];let color=null,file=t.file;
         if(t.colorable&&useColors){color=rnd(Object.keys(t.variants));file=t.variants[color].file}
         placed.push({t,color,file});}
+      const ft=floorTop[sc]||48, indoor=(sc==='playroom'||sc==='majlis'||sc==='office'), all=[];
       const cols=lv>=6?6:(lv>=3?5:4), rows=Math.ceil(placed.length/cols), cells=shuf([...Array(cols*rows).keys()]);
-      const targetImgs=placed.map((p,k)=>{const c=cells[k],x=(c%cols+.5)/cols*92+4+(Math.random()-.5)*6,y=(Math.floor(c/cols)+.5)/rows*54+40+(Math.random()-.5)*4,h=(lv>=6?10:lv>=3?12:15)+Math.random()*4;
-        return `<img src="lamha/${p.file}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;height:${h.toFixed(1)}%;max-width:${Math.floor(90/cols)}%;object-fit:contain;transform:translate(-50%,-50%);filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))">`}).join('');
-      const decorPool=pool.filter(t=>!types.includes(t)), decorCats=new Set();
-      let decorImgs='', dN=Math.round(total*1.6)+12;
-      for(let n=0;n<dN;n++){const t=decorPool.length?rnd(decorPool):rnd(types);decorCats.add(t.category);const dx=1+Math.random()*98,dy=30+Math.random()*66,dh=6+Math.random()*7;
-        decorImgs+=`<img src="lamha/${t.file}" style="left:${dx.toFixed(1)}%;top:${dy.toFixed(1)}%;height:${dh.toFixed(1)}%;max-width:14%;object-fit:contain;transform:translate(-50%,-50%);opacity:.92;filter:drop-shadow(0 1px 1px rgba(0,0,0,.1))">`;}
+      placed.forEach((p,k)=>{const c=cells[k],x=(c%cols+.5)/cols*84+8+(Math.random()-.5)*5,y=ft+6+(Math.floor(c/cols)+.5)/rows*(91-ft-6)+(Math.random()-.5)*3;
+        all.push({file:p.file,x,y,h:sizeOf(p.t),target:true});});
+      const decorPool=pool.filter(t=>!types.includes(t)), decorCats=new Set(), dN=Math.round(total*1.4)+10;
+      for(let n=0;n<dN;n++){const t=decorPool.length?rnd(decorPool):rnd(types);decorCats.add(t.category);
+        const wall=indoor&&WALL.has(t.item), x=3+Math.random()*94, y=wall?(12+Math.random()*Math.max(6,ft-22)):(ft+4+Math.random()*(91-ft-4));
+        all.push({file:t.file,x,y,h:sizeOf(t),target:false});}
+      all.sort((a,b)=>a.y-b.y);
+      const imgsHtml=all.map(o=>`<img src="lamha/${o.file}" style="left:${o.x.toFixed(1)}%;top:${o.y.toFixed(1)}%;height:${o.h.toFixed(1)}%;max-width:36%;object-fit:contain;transform:translate(-50%,-100%);z-index:${Math.round(o.y*2)+(o.target?1000:0)};filter:drop-shadow(0 1px 1px rgba(0,0,0,${o.target?'.2':'.1'}))">`).join('');
       const present=new Set([...types.map(t=>t.category),...decorCats]);
-      ctx.body.innerHTML=`<div class="lamWrap"><div class="lamBar"><i></i></div><div class="lamStage" style="background:${BG[sc]}">${SCENE[sc]||''}${decorImgs}${targetImgs}</div><div class="lamHint">احفظ المشهد…</div></div>`;
+      ctx.body.innerHTML=`<div class="lamWrap"><div class="lamBar"><i></i></div><div class="lamStage" style="background:${BG[sc]||'#EADFC8'}">${SCENE[sc]||''}${imgsHtml}</div><div class="lamHint">احفظ المشهد…</div></div>`;
       let q,ans; const colorable=placed.filter(p=>p.color), rr=Math.random();
       if(useColors&&colorable.length&&rr<.5){const p=rnd(colorable);ans=placed.filter(x=>x.t.category===p.t.category&&x.color===p.color).length;q=`كم ${p.t.name_ar} ${L.colors[p.color]} كان فيه؟`}
       else if(rr<.68){const absent=L.items.filter(i=>!present.has(i.category));if(absent.length){q=`كم ${rnd(absent).name_ar} كان فيه؟`;ans=0}else{const t=rnd(types);q=`كم ${t.name_ar} كان فيه؟`;ans=placed.filter(x=>x.t.category===t.category).length}}
