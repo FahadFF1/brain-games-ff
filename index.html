@@ -297,7 +297,6 @@ html[data-theme="dark"] .theme-toggle .ic-sun{display:flex}
 (function(){var b=document.getElementById('theme-toggle');b.addEventListener('click',function(){var d=document.documentElement;var next=d.getAttribute('data-theme')==='dark'?'light':'dark';d.setAttribute('data-theme',next);try{localStorage.setItem('bg-theme',next);}catch(e){}var mt=document.querySelector('meta[name=theme-color]');if(mt)mt.setAttribute('content',next==='dark'?'#0A130E':'#FFFFFF');});})();
 </script>
 <script src="/socket.io/socket.io.js"></script>
-<script src="lamha/catalog.js"></script>
 <script>
 /* ================= ART (inline SVG) ================= */
 const sv=(vb,w,inner,h)=>`<svg viewBox="${vb}" width="${w}" height="${h||w}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
@@ -854,64 +853,6 @@ GAMES.push({id:'stroop',name:'لون الحبر',cat:'المرونة',c1:'#FF8A8
       tap(b,()=>{const ok=col===ink;ok?c++:w++;ctx.mark(ok);if(L>=7)layout();next()});bs.appendChild(b)})};
     layout();next();ctx.info(left+'s');
     ctx.every(1000,()=>{left--;ctx.info(left+'s');if(left<=0)ctx.done({norm:clamp(Math.round((c-w)/30*100),0,100),stat:`${c} صح • ${w} غلط`})});
-  }});
-
-GAMES.push({id:'lamha',name:'لمحة',cat:'الذاكرة',c1:'#F2C14E',c2:'#E09A2E',
-  how:'مشهد مزدحم بالتفاصيل. مرّة يطلع لك لثوانٍ ثم يختفي ويسألك كم غرض كان فيه، ومرّة يبقى المشهد ويطلب منك تلقّط شيئاً محدّداً وسط الزحمة بمؤقّت. ركّز بسرعة!',
-  play(ctx){
-    // مشاهد كاملة مرسومة + مفتاح إجابة دقيق (عدّ ومواقع «أوجد») حلّلته بالنظر
-    const SCENES=[
-      {img:'majlis', counts:[{ar:'رجّال',n:8}],
-        finds:[{ar:'الساعة',x:50,y:6},{ar:'التلفزيون',x:13,y:76},{ar:'المبخرة',x:47,y:77},{ar:'الشبشب',x:36,y:93},{ar:'علبة المحارم',x:54,y:89},{ar:'الصندوق الخشبي',x:87,y:88}]},
-      {img:'park', counts:[{ar:'قارب',n:2},{ar:'عربة',n:3}],
-        finds:[{ar:'النافورة',x:22,y:70},{ar:'العربة الحمراء',x:38,y:52},{ar:'الرسّام',x:58,y:73},{ar:'صف البط',x:68,y:84}]},
-      {img:'beach', counts:[],
-        finds:[{ar:'القارب الشراعي',x:87,y:88},{ar:'البجعة العوّامة',x:44,y:82},{ar:'برج المنقذ',x:80,y:11},{ar:'عربة الآيس كريم',x:17,y:12}]},
-      {img:'court', counts:[{ar:'سلة',n:2}],
-        finds:[{ar:'الحكم',x:72,y:53},{ar:'لوحة النتائج',x:48,y:5},{ar:'صندوق الكور',x:8,y:75}]},
-      {img:'school', counts:[],
-        finds:[{ar:'المعلّمة',x:22,y:9},{ar:'الزحليقة',x:62,y:68},{ar:'العلم',x:35,y:57},{ar:'النطّاطة',x:52,y:86},{ar:'حوض الرمل',x:75,y:90}]}
-    ];
-    const rnd=a=>a[Math.floor(Math.random()*a.length)], shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
-    const withCounts=SCENES.filter(s=>s.counts.length);
-    const ROUNDS=5, lv=ctx.L;
-    let r=0,correct=0;
-    function nextRound(){ if(r>=ROUNDS)return ctx.done({norm:Math.round(correct/ROUNDS*100),stat:`${correct} من ${ROUNDS} صح`}); ctx.info(`${r+1}/${ROUNDS}`);
-      // تناوب: جولات زوجية عدّ (إن توفّر)، فردية أوجد
-      if(r%2===0 && withCounts.length) countRound(); else findRound();
-    }
-    function finishRound(ok){ if(ok)correct++; ctx.mark(ok); ctx.after(1150,()=>{r++;nextRound();}); }
-    // ===== وضع العدّ =====
-    function countRound(){
-      const sc=rnd(withCounts), q=rnd(sc.counts), ans=q.n;
-      const secsWatch=Math.max(4,9-lv);
-      ctx.body.innerHTML=`<div class="lamWrap"><div class="lamBar"><i></i></div><div class="lamStage" style="background-image:url(lamha/scenes/${sc.img}.png)"></div><div class="lamHint">احفظ المشهد…</div></div>`;
-      const bar=ctx.body.querySelector('.lamBar i'); if(bar){bar.style.transition=`width ${secsWatch}s linear`;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(bar)bar.style.width='0%'}));}
-      ctx.after(secsWatch*1000,()=>{
-        const set=new Set([ans]); let d=1; while(set.size<4){if(ans-d>=0)set.add(ans-d);if(set.size<4)set.add(ans+d);d++;}
-        const opts=shuf([...set]).slice(0,4).sort((a,b)=>a-b);
-        ctx.body.innerHTML=`<div class="lamAsk"><div class="lamQ">كم ${q.ar} كان في المشهد؟</div><div class="lamOpts">${opts.map(v=>`<button data-v="${v}">${v}</button>`).join('')}</div></div>`;
-        let picked=false;
-        ctx.body.querySelectorAll('.lamOpts button').forEach(b=>b.onclick=()=>{if(picked)return;picked=true;const v=+b.dataset.v,ok=v===ans;
-          ctx.body.querySelectorAll('.lamOpts button').forEach(x=>{if(+x.dataset.v===ans)x.classList.add('ok');else if(x===b)x.classList.add('bad')});
-          finishRound(ok);});
-      });
-    }
-    // ===== وضع أوجد الشيء =====
-    function findRound(){
-      const sc=rnd(SCENES), t=rnd(sc.finds);
-      const secsFind=Math.max(7,16-lv); let timeLeft=secsFind, ended=false;
-      ctx.body.innerHTML=`<div class="lamFind"><div class="lamFindQ">أوجد: <b>${t.ar}</b></div><div class="lamStage find" style="background-image:url(lamha/scenes/${sc.img}.png)"></div><div class="lamTime">الوقت: ${timeLeft} ث</div></div>`;
-      const stage=ctx.body.querySelector('.lamStage'), timeEl=ctx.body.querySelector('.lamTime');
-      function reveal(ok){ if(ended)return; ended=true; const ring=document.createElement('div');ring.className='lamRing';ring.style.left=t.x+'%';ring.style.top=t.y+'%';stage.appendChild(ring); finishRound(ok); }
-      stage.onclick=e=>{ if(ended)return; const rc=stage.getBoundingClientRect();
-        const dx=(e.clientX-rc.left)-t.x/100*rc.width, dy=(e.clientY-rc.top)-t.y/100*rc.height;
-        const hit=Math.hypot(dx,dy) < rc.width*0.12;
-        if(hit){reveal(true);} else { const m=document.createElement('div');m.className='lamMiss';m.style.left=(e.clientX-rc.left)+'px';m.style.top=(e.clientY-rc.top)+'px';stage.appendChild(m);setTimeout(()=>m.remove(),500); timeLeft=Math.max(0,timeLeft-2);timeEl.textContent='الوقت: '+timeLeft+' ث'; if(timeLeft<=0)reveal(false);} };
-      function tick(){ if(ended)return; if(timeLeft<=0){return reveal(false);} timeEl.textContent='الوقت: '+timeLeft+' ث'; timeLeft--; ctx.after(1000,tick); }
-      ctx.after(1000,tick);
-    }
-    nextRound();
   }});
 
 const G=Object.fromEntries(GAMES.map(g=>[g.id,g]));
