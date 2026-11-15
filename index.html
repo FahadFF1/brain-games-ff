@@ -124,7 +124,9 @@ svg{display:block}
 .lamStage{position:relative;width:100%;aspect-ratio:3/4;max-height:62vh;border-radius:18px;overflow:hidden;box-shadow:inset 0 0 0 2px rgba(14,26,20,.12);background:#EADFC8 center/cover no-repeat}
 .lamStage img{position:absolute}
 .lamObj{object-fit:contain;transform:translate(-50%,-100%);filter:drop-shadow(0 1px 2px rgba(0,0,0,.42))}
-.lamStage.find .lamObj{cursor:pointer}
+.lamStage.find{cursor:crosshair}
+.lamMiss{position:absolute;width:26px;height:26px;border-radius:50%;border:3px solid #E5484D;transform:translate(-50%,-50%);pointer-events:none;animation:lamMiss .5s ease forwards}
+@keyframes lamMiss{from{opacity:.9;transform:translate(-50%,-50%) scale(.5)}to{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}
 .lamObj.miss{animation:lamShake .3s}
 @keyframes lamShake{0%,100%{transform:translate(-50%,-100%)}25%{transform:translate(-60%,-100%)}75%{transform:translate(-40%,-100%)}}
 .lamRing{position:absolute;aspect-ratio:1;width:17%;border-radius:50%;box-shadow:0 0 0 4px #10b981,0 0 0 11px rgba(16,185,129,.38);transform:translate(-50%,-50%);pointer-events:none;animation:lamPop .4s ease}
@@ -855,130 +857,57 @@ GAMES.push({id:'stroop',name:'لون الحبر',cat:'المرونة',c1:'#FF8A8
   }});
 
 GAMES.push({id:'lamha',name:'لمحة',cat:'الذاكرة',c1:'#F2C14E',c2:'#E09A2E',
-  how:'مشهد يتعمّر بالأغراض بشكل منطقي. مرّة يطلع لك لثوانٍ ثم يختفي ويسألك كم غرض أو عن لونه، ومرّة يطلب منك تلقّط غرضاً محدّداً وسط الزحمة (مثل مبخرة أو ترمس أحمر). ركّز بسرعة!',
+  how:'مشهد مزدحم بالتفاصيل. مرّة يطلع لك لثوانٍ ثم يختفي ويسألك كم غرض كان فيه، ومرّة يبقى المشهد ويطلب منك تلقّط شيئاً محدّداً وسط الزحمة بمؤقّت. ركّز بسرعة!',
   play(ctx){
-    const L=window.CATALOG; if(!L){ctx.body.innerHTML='<div class="intro"><p class="ask">تعذّر تحميل مكتبة لمحة</p></div>';ctx.after(900,()=>ctx.done({norm:0,stat:'—'}));return}
-    const SCALE={car:50,tree:110,beach_umbrella:78,duck:16,bench:30,boy:85,picnic_basket:18,bicycle:48,kite:42,balloon:30,football:14,dog:26,cat:22,bird:11,flower_bush:34,girl:80,ice_cream_cart:72,butterfly:10,sand_bucket:13,basketball:16,teddy_bear:30,dallah:30,finjan:11,dates_plate:14,floor_cushion:26,mabkhara:18,tea_glass:13,teapot:22,thermos:24,lantern:30,palm_plant:92,prayer_beads:10,sweets_bowl:16,water_bottle:16,slippers:11,man_sitting:62,man_standing:100,sailboat:22,tissue_box:14,wall_clock:24};
-    const COLORS=['red','yellow','green','blue'];
-    const byItem={}; L.items.forEach(i=>{if(!byItem[i.item])byItem[i.item]=i;});
-    const NAME_FIX={slippers:'شبشب',man_sitting:'رجّال',boy:'ولد',girl:'بنت',beach_umbrella:'مظلة',lantern:'فانوس',prayer_beads:'مسبحة',dates_plate:'صحن تمر',sweets_bowl:'صحن حلى',ice_cream_cart:'عربة آيس كريم',wall_clock:'ساعة',flower_bush:'شجيرة ورد'};
+    // مشاهد كاملة مرسومة + مفتاح إجابة دقيق (عدّ ومواقع «أوجد») حلّلته بالنظر
+    const SCENES=[
+      {img:'majlis', counts:[{ar:'رجّال',n:8}],
+        finds:[{ar:'الساعة',x:50,y:6},{ar:'التلفزيون',x:13,y:76},{ar:'المبخرة',x:47,y:77},{ar:'الشبشب',x:36,y:93},{ar:'علبة المحارم',x:54,y:89},{ar:'الصندوق الخشبي',x:87,y:88}]},
+      {img:'park', counts:[{ar:'قارب',n:2},{ar:'عربة',n:3}],
+        finds:[{ar:'النافورة',x:22,y:70},{ar:'العربة الحمراء',x:38,y:52},{ar:'الرسّام',x:58,y:73},{ar:'صف البط',x:68,y:84}]},
+      {img:'beach', counts:[],
+        finds:[{ar:'القارب الشراعي',x:87,y:88},{ar:'البجعة العوّامة',x:44,y:82},{ar:'برج المنقذ',x:80,y:11},{ar:'عربة الآيس كريم',x:17,y:12}]},
+      {img:'court', counts:[{ar:'سلة',n:2}],
+        finds:[{ar:'الحكم',x:72,y:53},{ar:'لوحة النتائج',x:48,y:5},{ar:'صندوق الكور',x:8,y:75}]},
+      {img:'school', counts:[],
+        finds:[{ar:'المعلّمة',x:22,y:9},{ar:'الزحليقة',x:62,y:68},{ar:'العلم',x:35,y:57},{ar:'النطّاطة',x:52,y:86},{ar:'حوض الرمل',x:75,y:90}]}
+    ];
     const rnd=a=>a[Math.floor(Math.random()*a.length)], shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
-    const pickN=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
-    const sizeOf=it=>{const s=Math.min(SCALE[it]||22,110);return Math.max(7,Math.min(17,7+s/110*11));};
-    const fileFor=(it,c)=>{const o=byItem[it];if(!o)return null;return c&&o.colorable&&o.variants[c]?o.variants[c].file:o.file;};
-    const nameFor=it=>NAME_FIX[it]||(byItem[it]?byItem[it].name_ar:it);
-    // ===== تهيئة المشاهد: خلفية مفرّغة + مجموعات بمناطق منطقية =====
-    const SCN={
-      majlis:{bg:'majlis', groups:[
-        {id:'clock', item:'wall_clock', n:[1,1], zone:[42,58,8,15]},
-        {id:'lantern', item:'lantern', n:[1,2], zone:[12,88,8,16], edge:true},
-        {id:'men', item:'man_sitting', n:[3,6], anchors:[[27,31],[42,29],[57,29],[72,31],[12,50],[14,64],[86,50],[88,64],[36,90],[62,90]]},
-        {id:'dallah', item:'dallah', n:[1,2], zone:[40,60,56,64]},
-        {id:'teapot', item:'teapot', n:[0,1], zone:[31,44,58,66], colorable:true},
-        {id:'thermos', item:'thermos', n:[0,1], zone:[56,69,58,66], colorable:true},
-        {id:'finjan', item:'finjan', n:[2,6], zone:[34,66,66,78]},
-        {id:'dates', item:'dates_plate', n:[1,2], zone:[38,62,70,80]},
-        {id:'sweets', item:'sweets_bowl', n:[0,1], zone:[42,58,72,82]},
-        {id:'mabkhara', item:'mabkhara', n:[0,1], zone:[30,70,82,90]},
-        {id:'beads', item:'prayer_beads', n:[0,2], zone:[24,76,78,90]}
-      ], ask:['men','finjan','lantern','dallah','dates'], find:['mabkhara','dallah','clock','sweets','teapot','thermos']},
-      beach:{bg:'beach', groups:[
-        {id:'umbrella', item:'beach_umbrella', n:[1,3], zone:[12,88,44,70]},
-        {id:'kids', item:['boy','girl'], n:[1,3], zone:[12,88,58,92]},
-        {id:'ball', item:'football', n:[1,3], zone:[15,85,62,94]},
-        {id:'bucket', item:'sand_bucket', n:[0,3], zone:[15,85,78,95], colorable:true},
-        {id:'slippers', item:'slippers', n:[0,2], zone:[15,85,80,95], colorable:true},
-        {id:'balloon', item:'balloon', n:[0,2], zone:[14,86,42,68], colorable:true},
-        {id:'icecream', item:'ice_cream_cart', n:[0,1], zone:[66,86,48,62]},
-        {id:'dog', item:'dog', n:[0,1], zone:[15,85,60,92]},
-        {id:'duck', item:'duck', n:[0,3], zone:[16,84,14,30]},
-        {id:'boat', item:'sailboat', n:[0,1], zone:[22,78,9,26]}
-      ], ask:['umbrella','kids','ball','duck','balloon'], find:['icecream','dog','bucket','slippers','balloon','boat']},
-      park:{bg:'park', groups:[
-        {id:'people', item:['boy','girl'], n:[2,4], zone:[8,92,42,92]},
-        {id:'dog', item:'dog', n:[0,2], zone:[10,90,48,92]},
-        {id:'duck', item:'duck', n:[0,4], zone:[56,90,70,95]},
-        {id:'bench', item:'bench', n:[0,2], zone:[10,90,48,76]},
-        {id:'balloon', item:'balloon', n:[0,3], zone:[10,90,34,70], colorable:true},
-        {id:'kite', item:'kite', n:[0,2], zone:[10,90,28,52]},
-        {id:'ball', item:'football', n:[0,2], zone:[15,85,60,92]},
-        {id:'bike', item:'bicycle', n:[0,1], zone:[15,85,56,84], colorable:true},
-        {id:'icecream', item:'ice_cream_cart', n:[0,1], zone:[12,40,50,68]},
-        {id:'bush', item:'flower_bush', n:[0,3], zone:[8,92,42,90]},
-        {id:'butterfly', item:'butterfly', n:[0,3], zone:[12,88,30,66]}
-      ], ask:['people','duck','balloon','kite','dog'], find:['icecream','bike','balloon','dog','butterfly']}
-    };
-    const SCENES=Object.keys(SCN);
-    function compose(scn, find){
-      const cfg=SCN[scn], out=[];
-      cfg.groups.forEach(g=>{
-        let n=pickN(g.n[0],g.n[1]);
-        const isTarget=find&&find.gid===g.id;
-        if(isTarget){ n=g.colorable?Math.max(3,n):1; }
-        const items=Array.isArray(g.item)?g.item:[g.item];
-        const anchors=g.anchors?shuf(g.anchors.slice()):null;
-        let placedTarget=false;
-        for(let k=0;k<n;k++){
-          const it=rnd(items); let color=null, target=false;
-          if(byItem[it]&&byItem[it].colorable&&g.colorable)color=rnd(COLORS);
-          if(isTarget){ if(g.colorable){ if(!placedTarget){color=find.color;target=true;placedTarget=true;} else color=rnd(COLORS.filter(c=>c!==find.color)); } else { target=true; } }
-          let x,y;
-          if(anchors){ const a=anchors[k%anchors.length]; x=a[0]; y=a[1]; }
-          else if(g.edge){ x=(k%2===0?g.zone[0]+Math.random()*10:g.zone[1]-Math.random()*10); y=g.zone[2]+Math.random()*(g.zone[3]-g.zone[2]); }
-          else { x=g.zone[0]+Math.random()*(g.zone[1]-g.zone[0]); y=g.zone[2]+Math.random()*(g.zone[3]-g.zone[2]); }
-          x+=(Math.random()-.5)*2.5; y+=(Math.random()-.5)*2;
-          const file=fileFor(it,color); if(!file)continue;
-          out.push({gid:g.id,item:it,color,x,y,h:sizeOf(it),target,file});
-        }
-      });
-      if(find&&!out.some(o=>o.target)){ const g=cfg.groups.find(x=>x.id===find.gid); const it=Array.isArray(g.item)?g.item[0]:g.item; const a=g.anchors?g.anchors[0]:[(g.zone[0]+g.zone[1])/2,(g.zone[2]+g.zone[3])/2]; out.push({gid:g.id,item:it,color:g.colorable?find.color:null,x:a[0],y:a[1],h:sizeOf(it),target:true,file:fileFor(it,g.colorable?find.color:null)}); }
-      out.sort((a,b)=>a.y-b.y);
-      return {out,cfg};
-    }
-    const html=out=>out.map(o=>`<img class="lamObj" ${o.target?'data-t="1"':''} src="lamha/${o.file}" style="left:${o.x.toFixed(1)}%;top:${o.y.toFixed(1)}%;height:${o.h.toFixed(1)}%;max-width:28%;z-index:${o.target?999:Math.round(o.y)}">`).join('');
-    const ROUNDS=5, lv=ctx.L, useColors=lv>=2;
+    const withCounts=SCENES.filter(s=>s.counts.length);
+    const ROUNDS=5, lv=ctx.L;
     let r=0,correct=0;
-    function nextRound(){ if(r>=ROUNDS)return ctx.done({norm:Math.round(correct/ROUNDS*100),stat:`${correct} من ${ROUNDS} صح`}); ctx.info(`${r+1}/${ROUNDS}`); (r%2===1?findRound:glimpseRound)(); }
-    function finishRound(ok){ if(ok)correct++; ctx.mark(ok); ctx.after(1150,()=>{r++;nextRound();}); }
-    // ===== وضع اللمحة: عدّ / لون =====
-    function glimpseRound(){
-      const scn=rnd(SCENES), {out,cfg}=compose(scn);
-      ctx.body.innerHTML=`<div class="lamWrap"><div class="lamBar"><i></i></div><div class="lamStage" style="background-image:url(lamha/bg/${cfg.bg}.png)">${html(out)}</div><div class="lamHint">احفظ المشهد…</div></div>`;
-      const cntG=id=>out.filter(o=>o.gid===id).length;
-      const cntIC=(it,c)=>out.filter(o=>o.item===it&&o.color===c).length;
-      let q,ans; const rr=Math.random();
-      const colorG=cfg.groups.filter(g=>g.colorable&&cntG(g.id)>0);
-      if(useColors&&colorG.length&&rr<.45){const g=rnd(colorG),it=Array.isArray(g.item)?g.item[0]:g.item,c=rnd(COLORS);ans=cntIC(it,c);q=`كم ${nameFor(it)} ${L.colors[c]} كان في المشهد؟`;}
-      else{const aks=cfg.ask.filter(id=>cntG(id)>0);const id=rnd(aks.length?aks:cfg.ask);ans=cntG(id);const g=cfg.groups.find(x=>x.id===id),it=Array.isArray(g.item)?g.item[0]:g.item;q=`كم ${nameFor(it)} كان في المشهد؟`;}
-      const secsWatch=Math.max(3,8-Math.round(lv*.5));
-      const bar=ctx.body.querySelector('.lamBar i'); if(bar){bar.style.transition=`width ${secsWatch}s linear`;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(bar)bar.style.width='0%'}));}
-      ctx.after(secsWatch*1000,()=>askCount(q,ans));
+    function nextRound(){ if(r>=ROUNDS)return ctx.done({norm:Math.round(correct/ROUNDS*100),stat:`${correct} من ${ROUNDS} صح`}); ctx.info(`${r+1}/${ROUNDS}`);
+      // تناوب: جولات زوجية عدّ (إن توفّر)، فردية أوجد
+      if(r%2===0 && withCounts.length) countRound(); else findRound();
     }
-    function askCount(q,ans){
-      const set=new Set([ans]); let d=1; while(set.size<4){if(ans-d>=0)set.add(ans-d);if(set.size<4)set.add(ans+d);d++;}
-      const opts=shuf([...set]).slice(0,4).sort((a,b)=>a-b);
-      ctx.body.innerHTML=`<div class="lamAsk"><div class="lamQ">${q}</div><div class="lamOpts">${opts.map(v=>`<button data-v="${v}">${v}</button>`).join('')}</div></div>`;
-      let picked=false;
-      ctx.body.querySelectorAll('.lamOpts button').forEach(b=>b.onclick=()=>{if(picked)return;picked=true;const v=+b.dataset.v,ok=v===ans;
-        ctx.body.querySelectorAll('.lamOpts button').forEach(x=>{if(+x.dataset.v===ans)x.classList.add('ok');else if(x===b)x.classList.add('bad')});
-        finishRound(ok);});
+    function finishRound(ok){ if(ok)correct++; ctx.mark(ok); ctx.after(1150,()=>{r++;nextRound();}); }
+    // ===== وضع العدّ =====
+    function countRound(){
+      const sc=rnd(withCounts), q=rnd(sc.counts), ans=q.n;
+      const secsWatch=Math.max(4,9-lv);
+      ctx.body.innerHTML=`<div class="lamWrap"><div class="lamBar"><i></i></div><div class="lamStage" style="background-image:url(lamha/scenes/${sc.img}.png)"></div><div class="lamHint">احفظ المشهد…</div></div>`;
+      const bar=ctx.body.querySelector('.lamBar i'); if(bar){bar.style.transition=`width ${secsWatch}s linear`;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(bar)bar.style.width='0%'}));}
+      ctx.after(secsWatch*1000,()=>{
+        const set=new Set([ans]); let d=1; while(set.size<4){if(ans-d>=0)set.add(ans-d);if(set.size<4)set.add(ans+d);d++;}
+        const opts=shuf([...set]).slice(0,4).sort((a,b)=>a-b);
+        ctx.body.innerHTML=`<div class="lamAsk"><div class="lamQ">كم ${q.ar} كان في المشهد؟</div><div class="lamOpts">${opts.map(v=>`<button data-v="${v}">${v}</button>`).join('')}</div></div>`;
+        let picked=false;
+        ctx.body.querySelectorAll('.lamOpts button').forEach(b=>b.onclick=()=>{if(picked)return;picked=true;const v=+b.dataset.v,ok=v===ans;
+          ctx.body.querySelectorAll('.lamOpts button').forEach(x=>{if(+x.dataset.v===ans)x.classList.add('ok');else if(x===b)x.classList.add('bad')});
+          finishRound(ok);});
+      });
     }
     // ===== وضع أوجد الشيء =====
     function findRound(){
-      const scn=rnd(SCENES), cfg=SCN[scn];
-      const fid=rnd(cfg.find), g=cfg.groups.find(x=>x.id===fid);
-      const it=Array.isArray(g.item)?g.item[0]:g.item;
-      const color=(useColors&&g.colorable)?rnd(COLORS):null;
-      const {out}=compose(scn,{gid:fid,color});
-      const qLabel=color?`${nameFor(it)} ${L.colors[color]}`:nameFor(it);
-      const secsFind=Math.max(6,15-Math.round(lv));
-      let timeLeft=secsFind, ended=false;
-      ctx.body.innerHTML=`<div class="lamFind"><div class="lamFindQ">أوجد: <b>${qLabel}</b></div><div class="lamStage find" style="background-image:url(lamha/bg/${cfg.bg}.png)">${html(out)}</div><div class="lamTime">الوقت: ${timeLeft} ث</div></div>`;
+      const sc=rnd(SCENES), t=rnd(sc.finds);
+      const secsFind=Math.max(7,16-lv); let timeLeft=secsFind, ended=false;
+      ctx.body.innerHTML=`<div class="lamFind"><div class="lamFindQ">أوجد: <b>${t.ar}</b></div><div class="lamStage find" style="background-image:url(lamha/scenes/${sc.img}.png)"></div><div class="lamTime">الوقت: ${timeLeft} ث</div></div>`;
       const stage=ctx.body.querySelector('.lamStage'), timeEl=ctx.body.querySelector('.lamTime');
-      const tgt=out.find(o=>o.target)||out[0];
-      function reveal(ok){ if(ended)return; ended=true; const ring=document.createElement('div');ring.className='lamRing';ring.style.left=tgt.x+'%';ring.style.top=(tgt.y-tgt.h/2)+'%';stage.appendChild(ring); finishRound(ok); }
-      stage.querySelectorAll('.lamObj').forEach(el=>el.onclick=()=>{ if(ended)return;
-        if(el.dataset.t==='1'){reveal(true);} else {el.classList.remove('miss');void el.offsetWidth;el.classList.add('miss');timeLeft=Math.max(0,timeLeft-2);timeEl.textContent='الوقت: '+timeLeft+' ث';if(timeLeft<=0)reveal(false);} });
+      function reveal(ok){ if(ended)return; ended=true; const ring=document.createElement('div');ring.className='lamRing';ring.style.left=t.x+'%';ring.style.top=t.y+'%';stage.appendChild(ring); finishRound(ok); }
+      stage.onclick=e=>{ if(ended)return; const rc=stage.getBoundingClientRect();
+        const dx=(e.clientX-rc.left)-t.x/100*rc.width, dy=(e.clientY-rc.top)-t.y/100*rc.height;
+        const hit=Math.hypot(dx,dy) < rc.width*0.12;
+        if(hit){reveal(true);} else { const m=document.createElement('div');m.className='lamMiss';m.style.left=(e.clientX-rc.left)+'px';m.style.top=(e.clientY-rc.top)+'px';stage.appendChild(m);setTimeout(()=>m.remove(),500); timeLeft=Math.max(0,timeLeft-2);timeEl.textContent='الوقت: '+timeLeft+' ث'; if(timeLeft<=0)reveal(false);} };
       function tick(){ if(ended)return; if(timeLeft<=0){return reveal(false);} timeEl.textContent='الوقت: '+timeLeft+' ث'; timeLeft--; ctx.after(1000,tick); }
       ctx.after(1000,tick);
     }
