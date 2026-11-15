@@ -118,6 +118,19 @@ svg{display:block}
 @keyframes markf{0%{opacity:1;transform:scale(.5)}55%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(1)}}
 .stage{width:100%;height:340px;background:linear-gradient(#EAF6FD,#fff);border-radius:24px;position:relative;overflow:hidden;direction:ltr;box-shadow:inset 0 0 0 2px var(--line)}
 .stage.plain{background:#EAF4EC}
+.lamWrap{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center}
+.lamBar{width:100%;height:8px;background:#E7EDE9;border-radius:9px;overflow:hidden;margin-bottom:8px}
+.lamBar i{display:block;height:100%;width:100%;background:var(--green);border-radius:9px}
+.lamStage{position:relative;width:100%;aspect-ratio:3/4;max-height:60vh;border-radius:18px;overflow:hidden;box-shadow:inset 0 0 0 2px rgba(14,26,20,.12)}
+.lamStage img{position:absolute}
+.lamHint{color:var(--muted);font-weight:800;font-size:13px;margin-top:8px}
+.lamAsk{width:100%;max-width:400px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:10px}
+.lamQ{font-size:23px;font-weight:900;line-height:1.5;color:var(--ink)}
+.lamOpts{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:320px}
+.lamOpts button{background:var(--card);border-radius:16px;padding:18px 0;font-size:26px;font-weight:900;box-shadow:0 4px 0 var(--line);color:var(--ink);font-variant-numeric:tabular-nums}
+.lamOpts button:active{transform:translateY(2px);box-shadow:none}
+.lamOpts button.ok{background:var(--good);color:#fff;box-shadow:0 4px 0 #00733F}
+.lamOpts button.bad{background:var(--bad);color:#fff;box-shadow:0 4px 0 #B9363A}
 .fly{position:absolute;left:0;top:0;will-change:transform}
 .walk svg{animation:bob .32s ease-in-out infinite alternate}
 @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-4px)}}
@@ -272,11 +285,13 @@ html[data-theme="dark"] .theme-toggle .ic-sun{display:flex}
 (function(){var b=document.getElementById('theme-toggle');b.addEventListener('click',function(){var d=document.documentElement;var next=d.getAttribute('data-theme')==='dark'?'light':'dark';d.setAttribute('data-theme',next);try{localStorage.setItem('bg-theme',next);}catch(e){}var mt=document.querySelector('meta[name=theme-color]');if(mt)mt.setAttribute('content',next==='dark'?'#0A130E':'#FFFFFF');});})();
 </script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="lamha/catalog.js"></script>
 <script>
 /* ================= ART (inline SVG) ================= */
 const sv=(vb,w,inner,h)=>`<svg viewBox="${vb}" width="${w}" height="${h||w}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
 const ART={
   /* game glyphs, 64x64, drawn in white on a coloured badge */
+  lamha:'<ellipse cx="32" cy="35" rx="23" ry="15" fill="none" stroke="#fff" stroke-width="4.5"/><circle cx="32" cy="35" r="8" fill="#fff"/><path d="M49 11l2.4 5.1 5.1 2.4-5.1 2.4-2.4 5.1-2.4-5.1-5.1-2.4 5.1-2.4z" fill="#fff"/>',
   calc:`<rect x="15" y="10" width="34" height="44" rx="7" fill="#fff"/><rect x="20" y="15" width="24" height="9" rx="3" fill="#FCD9C8"/><g fill="#E8673A"><circle cx="24" cy="32" r="3"/><circle cx="32" cy="32" r="3"/><circle cx="40" cy="32" r="3"/><circle cx="24" cy="41" r="3"/><circle cx="32" cy="41" r="3"/><circle cx="24" cy="49" r="0"/></g><rect x="37" y="38" width="6" height="12" rx="3" fill="#E8673A"/><rect x="21" y="45" width="14" height="5" rx="2.5" fill="#E8673A"/>`,
   flyby:`<path d="M12 38l-7-8 2 12z" fill="#fff"/><ellipse cx="29" cy="38" rx="17" ry="11" fill="#fff"/><path d="M24 36 38 13 45 35z" fill="#CDEFFF"/><circle cx="43" cy="33" r="8" fill="#fff"/><path d="M50 32l8 2.5-8 2.5z" fill="#F6B04A"/><circle cx="45" cy="31" r="1.8" fill="#17202B"/>`,
   stroop:`<circle cx="25" cy="26" r="13" fill="#FF6B6E"/><circle cx="39" cy="26" r="13" fill="#5B8CFF" opacity=".92"/><circle cx="32" cy="39" r="13" fill="#FFD24A" opacity=".92"/>`,
@@ -827,6 +842,48 @@ GAMES.push({id:'stroop',name:'لون الحبر',cat:'المرونة',c1:'#FF8A8
       tap(b,()=>{const ok=col===ink;ok?c++:w++;ctx.mark(ok);if(L>=7)layout();next()});bs.appendChild(b)})};
     layout();next();ctx.info(left+'s');
     ctx.every(1000,()=>{left--;ctx.info(left+'s');if(left<=0)ctx.done({norm:clamp(Math.round((c-w)/30*100),0,100),stat:`${c} صح • ${w} غلط`})});
+  }});
+
+GAMES.push({id:'lamha',name:'لمحة',cat:'الذاكرة',c1:'#F2C14E',c2:'#E09A2E',
+  how:'يطلع مشهد مزدحم بالأغراض لثواني، بعدين يختفي ويجيك سؤال عن تفصيلة فيه. ما تدري وش بينسأل عنه — فركّز على كل شي!',
+  play(ctx){
+    const L=window.CATALOG; if(!L){ctx.body.innerHTML='<div class="intro"><p class="ask">تعذّر تحميل مكتبة لمحة</p></div>';ctx.after(900,()=>ctx.done({norm:0,stat:'—'}));return}
+    const BG={park:'#CFE6A8',playroom:'#F3E3C7',majlis:'#EFD9B4',office:'#DDE7EE'};
+    const rnd=a=>a[Math.floor(Math.random()*a.length)], shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+    const ROUNDS=5, lv=ctx.L;
+    const total=Math.min(40,6+Math.round(lv*3.2)), secsWatch=Math.max(5,15-lv), useColors=lv>=3;
+    let r=0,correct=0;
+    function round(){
+      ctx.info(`${r+1}/${ROUNDS}`);
+      const sc=rnd(Object.keys(L.scenes)), pool=L.items.filter(i=>i.scene===sc);
+      const nTypes=Math.max(3,Math.min(pool.length,Math.round(total/3)));
+      const types=shuf(pool).slice(0,nTypes), placed=[];
+      for(let n=0;n<total;n++){const t=types[n%types.length];let color=null,file=t.file;
+        if(t.colorable&&useColors){color=rnd(Object.keys(t.variants));file=t.variants[color].file}
+        placed.push({t,color,file});}
+      const cols=lv>=6?6:(lv>=3?5:4), rows=Math.ceil(placed.length/cols), cells=shuf([...Array(cols*rows).keys()]);
+      const imgs=placed.map((p,k)=>{const c=cells[k],x=(c%cols+.5)/cols*100+(Math.random()-.5)*7,y=(Math.floor(c/cols)+.5)/rows*100+(Math.random()-.5)*5,h=(lv>=6?11:lv>=3?14:18)+Math.random()*4;
+        return `<img src="lamha/${p.file}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;height:${h.toFixed(1)}%;max-width:${Math.floor(92/cols)}%;object-fit:contain;transform:translate(-50%,-50%)">`}).join('');
+      ctx.body.innerHTML=`<div class="lamWrap"><div class="lamBar"><i></i></div><div class="lamStage" style="background:${BG[sc]}">${imgs}</div><div class="lamHint">احفظ المشهد…</div></div>`;
+      let q,ans; const colorable=placed.filter(p=>p.color), rr=Math.random();
+      if(useColors&&colorable.length&&rr<.5){const p=rnd(colorable);ans=placed.filter(x=>x.t.category===p.t.category&&x.color===p.color).length;q=`كم ${p.t.name_ar} ${L.colors[p.color]} كان فيه؟`}
+      else if(rr<.68){const absent=L.items.filter(i=>i.scene===sc&&!types.some(t=>t.category===i.category));if(absent.length){q=`كم ${rnd(absent).name_ar} كان فيه؟`;ans=0}else{const t=rnd(types);q=`كم ${t.name_ar} كان فيه؟`;ans=placed.filter(x=>x.t.category===t.category).length}}
+      else{const t=rnd(types);q=`كم ${t.name_ar} كان فيه؟`;ans=placed.filter(x=>x.t.category===t.category).length}
+      const bar=ctx.body.querySelector('.lamBar i'); if(bar){bar.style.transition=`width ${secsWatch}s linear`; requestAnimationFrame(()=>requestAnimationFrame(()=>{if(bar)bar.style.width='0%'}));}
+      ctx.after(secsWatch*1000,()=>ask(q,ans));
+    }
+    function ask(q,ans){
+      const set=new Set([ans]); let d=1; while(set.size<4){if(ans-d>=0)set.add(ans-d);if(set.size<4)set.add(ans+d);d++;}
+      const opts=shuf([...set]).slice(0,4).sort((a,b)=>a-b);
+      ctx.body.innerHTML=`<div class="lamAsk"><div class="lamQ">${q}</div><div class="lamOpts">${opts.map(v=>`<button data-v="${v}">${v}</button>`).join('')}</div></div>`;
+      let picked=false;
+      ctx.body.querySelectorAll('.lamOpts button').forEach(b=>b.onclick=()=>{if(picked)return;picked=true;
+        const v=+b.dataset.v, ok=v===ans; if(ok)correct++; ctx.mark(ok);
+        ctx.body.querySelectorAll('.lamOpts button').forEach(x=>{if(+x.dataset.v===ans)x.classList.add('ok');else if(x===b)x.classList.add('bad')});
+        ctx.after(1100,()=>{r++; if(r<ROUNDS)round(); else ctx.done({norm:Math.round(correct/ROUNDS*100),stat:`${correct} من ${ROUNDS} صح`})});
+      });
+    }
+    round();
   }});
 
 const G=Object.fromEntries(GAMES.map(g=>[g.id,g]));
